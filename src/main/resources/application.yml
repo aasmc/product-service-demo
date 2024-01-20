@@ -1,0 +1,26 @@
+server:
+  port: 8085
+  shutdown: graceful
+
+spring:
+  application:
+    name: product-service
+  datasource:
+    username: user
+    password: password
+    url: jdbc:postgresql://localhost:5432/product_service_db
+    hikari:
+      connection-timeout: 2000 #ms
+      maximum-pool-size: 5
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+
+crypto:
+  salt: Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB
+  minHashLength: 10
