@@ -21,6 +21,10 @@ spring:
         format_sql: true
         show_sql: true
 
+
 crypto:
   salt: Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB
   minHashLength: 10
+logging:
+  level:
+    ru.aasmc: DEBUG

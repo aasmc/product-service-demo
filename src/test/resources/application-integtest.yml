@@ -4,3 +4,7 @@ spring:
     url: jdbc:tc:postgresql:16.1:///test_database
     username: user
     password: password
+
+logging:
+  level:
+    ru.aasmc: DEBUG
