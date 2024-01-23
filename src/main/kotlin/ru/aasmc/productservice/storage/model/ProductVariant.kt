@@ -4,6 +4,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonBinaryType
 import jakarta.persistence.*
 import ru.aasmc.productservice.dto.ImageCollection
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "product_variants")
@@ -24,7 +25,13 @@ class ProductVariant(
     var images: ImageCollection = ImageCollection(),
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    var product: Product
+    var product: Product,
+    @Column(name = "created_at")
+    @org.hibernate.annotations.CreationTimestamp
+    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "updated_at")
+    @org.hibernate.annotations.UpdateTimestamp
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
 
     init {

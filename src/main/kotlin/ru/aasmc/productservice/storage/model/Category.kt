@@ -1,6 +1,7 @@
 package ru.aasmc.productservice.storage.model
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "categories")
@@ -17,7 +18,13 @@ class Category(
     val subCategories: MutableSet<Category> = hashSetOf(),
     @OneToMany(mappedBy = "category", cascade = [CascadeType.ALL])
     @org.hibernate.annotations.BatchSize(size = 10)
-    val categoryAttributes: MutableSet<CategoryAttribute> = hashSetOf()
+    val categoryAttributes: MutableSet<Attribute> = hashSetOf(),
+    @Column(name = "created_at", nullable = false)
+    @org.hibernate.annotations.CreationTimestamp
+    val createdAt: LocalDateTime,
+    @Column(name = "updated_at", nullable = false)
+    @org.hibernate.annotations.UpdateTimestamp
+    val updatedAt: LocalDateTime
 ) {
 
     override fun toString(): String {

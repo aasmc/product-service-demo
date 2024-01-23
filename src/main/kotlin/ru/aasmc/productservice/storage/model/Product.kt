@@ -2,6 +2,7 @@ package ru.aasmc.productservice.storage.model
 
 import jakarta.persistence.*
 import org.hibernate.annotations.BatchSize
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "products")
@@ -19,7 +20,13 @@ class Product(
     var description: String,
     @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL])
     @BatchSize(size = 10)
-    val variants: MutableSet<ProductVariant> = hashSetOf()
+    val variants: MutableSet<ProductVariant> = hashSetOf(),
+    @Column(name = "created_at")
+    @org.hibernate.annotations.CreationTimestamp
+    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "updated_at")
+    @org.hibernate.annotations.UpdateTimestamp
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
 
     fun addVariant(variant: ProductVariant) {

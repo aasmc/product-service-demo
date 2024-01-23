@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component
 import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.storage.model.Attribute
 import ru.aasmc.productservice.storage.model.AttributeValue
-import ru.aasmc.productservice.storage.model.AttributeValueComponent
-import ru.aasmc.productservice.storage.repository.AttributeValueComponentRepository
 import ru.aasmc.productservice.storage.repository.AttributeValueRepository
 import ru.aasmc.productservice.utils.CryptoTool
 
