@@ -2,7 +2,7 @@ package ru.aasmc.productservice.mapper
 
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import ru.aasmc.productservice.dto.ProductVariantFullResponseDto
+import ru.aasmc.productservice.dto.ProductVariantResponse
 import ru.aasmc.productservice.dto.ProductVariantRequestDto
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.storage.model.Product
@@ -32,8 +32,8 @@ class ProductVariantMapper(
         )
     }
 
-    fun toProductVariantFullResponse(domain: ProductVariant): ProductVariantFullResponseDto =
-        ProductVariantFullResponseDto(
+    fun toProductVariantFullResponse(domain: ProductVariant): ProductVariantResponse =
+        ProductVariantResponse(
             productId = cryptoTool.hashOf(domain.product.id!!),
             variantId = cryptoTool.hashOf(domain.id!!),
             variantName = domain.variantName,

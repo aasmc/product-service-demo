@@ -6,11 +6,11 @@ import jakarta.persistence.*
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "attribute_values")
 @DiscriminatorColumn(name = "av_type")
-abstract class AttributeValue(
+sealed class AttributeValue(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)
     var attribute: Attribute,
     @OneToOne(fetch = FetchType.LAZY)
@@ -36,7 +36,7 @@ class StringAttributeValue(
     @Column(name = "string_value")
     var stringValue: String,
     @Column(name = "string_ru_value")
-    var stringRuValue: String
+    var stringRuValue: String?
 ): AttributeValue(attribute = attribute, compositeAttributeValue = compositeAttributeValue)
 
 @Entity
@@ -47,7 +47,7 @@ class NumericAttributeValue(
     @Column(name = "num_value")
     var numValue: Number,
     @Column(name = "num_ru_value")
-    var numRuValue: Number,
+    var numRuValue: Number?,
     @Column(name = "num_unit")
     var numUnit: String
 ): AttributeValue(attribute = attribute, compositeAttributeValue = compositeAttributeValue)
@@ -70,7 +70,7 @@ class CompositeAttributeValue(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     var name: String,
     @OneToOne(mappedBy = "compositeAttributeValue", fetch = FetchType.LAZY)
     var value: AttributeValue,

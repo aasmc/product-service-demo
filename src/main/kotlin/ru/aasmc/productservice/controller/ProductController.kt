@@ -2,15 +2,7 @@ package ru.aasmc.productservice.controller
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.service.ProductService
 
@@ -22,7 +14,7 @@ class ProductController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createProduct(@RequestBody dto: CreateProductRequest): CreateProductResponse {
+    fun createProduct(@RequestBody dto: CreateProductRequest): ProductResponse {
         log.info("Received POST request to create product: {}", dto)
         return productService.createProduct(dto)
     }
@@ -34,13 +26,13 @@ class ProductController(
     }
 
     @GetMapping("/variant/{id}")
-    fun getProductVariants(@PathVariable("id") id: String): List<ProductVariantFullResponseDto> {
+    fun getProductVariants(@PathVariable("id") id: String): List<ProductVariantResponse> {
         log.info("Received request to GET variants of product with ID={}", id)
         return productService.getProductVariants(id)
     }
 
     @PutMapping("/{productId}/variant")
-    fun addProductVariant(@PathVariable("productId") productId: String, dto: ProductVariantRequestDto): ProductVariantFullResponseDto {
+    fun addProductVariant(@PathVariable("productId") productId: String, dto: ProductVariantRequestDto): ProductVariantResponse {
         log.info("Received PUT request to add product variant: {}", dto)
         return productService.addProductVariant(productId, dto)
     }

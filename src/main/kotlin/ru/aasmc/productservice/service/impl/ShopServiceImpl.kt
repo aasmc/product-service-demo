@@ -4,9 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import ru.aasmc.productservice.dto.CreateShopRequest
-import ru.aasmc.productservice.dto.CreateShopResponse
-import ru.aasmc.productservice.dto.ShopFullResponse
-import ru.aasmc.productservice.dto.ShopShortResponse
+import ru.aasmc.productservice.dto.ShopResponse
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.mapper.ShopMapper
 import ru.aasmc.productservice.service.ShopService
@@ -21,18 +19,18 @@ class ShopServiceImpl(
     private val cryptoTool: CryptoTool
 ) : ShopService {
 
-    override fun createShop(dto: CreateShopRequest): CreateShopResponse {
+    override fun createShop(dto: CreateShopRequest): ShopResponse {
         val shop = shopRepository.save(mapper.toDomain(dto))
         log.debug("Successfully saved shop to repository. {}", shop)
-        return mapper.toCreateDto(shop)
+        return mapper.toFullResponse(shop)
     }
 
-    override fun getShopByIdWithoutProducts(hashedId: String): ShopShortResponse {
+    override fun getShopByIdWithoutProducts(hashedId: String): ShopResponse {
         val shop = getShopOrThrow(hashedId)
-        return mapper.toShortResponse(shop)
+        return mapper.toFullResponse(shop)
     }
 
-    override fun getShopByIdWithProducts(hashedId: String): ShopFullResponse {
+    override fun getShopByIdWithProducts(hashedId: String): ShopResponse {
         val shop = getShopOrThrow(hashedId)
         return mapper.toFullResponse(shop)
     }

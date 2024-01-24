@@ -16,8 +16,6 @@ class Attribute(
     var isFaceted: Boolean,
     @Column(name = "is_composite", nullable = false)
     var isComposite: Boolean,
-    @Column(name = "is_required", nullable = false)
-    var isRequired: Boolean,
     @Column(name = "created_at")
     @org.hibernate.annotations.CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -26,13 +24,10 @@ class Attribute(
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     @OneToMany(mappedBy = "attribute", cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
     @org.hibernate.annotations.BatchSize(size = 10)
-    val attributeValues: MutableSet<AttributeValue>? = hashSetOf(),
+    val attributeValues: MutableSet<AttributeValue> = hashSetOf(),
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "attribute", cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
     @org.hibernate.annotations.BatchSize(size = 10)
-    val compositeAttributeValues: MutableSet<CompositeAttributeValue>? = hashSetOf(),
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    var category: Category? = null,
+    val compositeAttributeValues: MutableSet<CompositeAttributeValue> = hashSetOf(),
 ) {
 
     override fun toString(): String {

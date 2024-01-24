@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
-import ru.aasmc.productservice.dto.CreateCategoryResponse
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.mapper.CategoryMapper
 import ru.aasmc.productservice.service.CategoryService
@@ -21,10 +20,12 @@ class CategoryServiceImpl(
     private val cryptoTool: CryptoTool
 ): CategoryService {
 
-    override fun createCategory(dto: CreateCategoryRequest): CreateCategoryResponse {
+    override fun createCategory(dto: CreateCategoryRequest): CategoryResponse {
+        // TODO handle new attributes here, since we need to add a new, but persisted attribute to a
+        // persisted category
         val category = categoryRepository.save(mapper.toDomain(dto))
         log.debug("Successfully saved category to DB. {}", category)
-        return mapper.toCreateCategoryResponse(category)
+        return mapper.toCategoryResponse(category)
     }
 
     override fun getCategoryById(id: String): CategoryResponse {

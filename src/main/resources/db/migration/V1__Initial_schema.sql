@@ -34,11 +34,9 @@ CREATE INDEX categories_updated_at_idx ON categories(updated_at);
 CREATE TABLE attributes(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    category_id BIGINT REFERENCES categories(name),
     short_name VARCHAR(255) NOT NULL,
     is_faceted BOOLEAN NOT NULL DEFAULT true,
     is_composite BOOLEAN NOT NULL DEFAULT false,
-    is_required BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
@@ -46,10 +44,17 @@ CREATE TABLE attributes(
 CREATE INDEX attributes_category_id_idx ON attributes(category_id);
 CREATE INDEX attributes_updated_at_idx ON attributes(updated_at);
 
+CREATE TABLE category_attributes(
+    category_id BIGINT REFERENCES categories(id) NOT NULL,
+    attribute_id BIGINT REFERENCES attributes(id) NOT NULL,
+    is_required BOOLEAN NOT NULL DEFAULT false,
+    PRIMARY KEY(category_id, attribute_id)
+);
+
 CREATE TABLE composite_attribute_value(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     attribute_id BIGINT NOT NULL REFERENCES attributes(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE attribute_values(
@@ -57,7 +62,7 @@ CREATE TABLE attribute_values(
     av_type VARCHAR(10) NOT NULL,
     attribute_id BIGINT NOT NULL REFERENCES attributes(id) ON DELETE CASCADE,
     composite_attribute_value_id BIGINT REFERENCES composite_attribute_value(id),
-    string_value TEXT,
+    string_value TEXT UNIQUE,
     string_ru_value TEXT,
     num_value NUMERIC,
     num_ru_value NUMERIC,
@@ -67,6 +72,7 @@ CREATE TABLE attribute_values(
 );
 
 CREATE INDEX attribute_values_attribute_id_idx ON attribute_values(attribute_id);
+CREATE UNIQUE INDEX attribute_values_num_value_num_ru_value_num_unit_idx ON attribute_values(num_value, num_ru_value, num_unit);
 
 
 CREATE TABLE products(

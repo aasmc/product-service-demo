@@ -1,7 +1,9 @@
 package ru.aasmc.productservice.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonValue
+import java.time.LocalDateTime
 
 enum class AttributeType(
     @field:JsonValue
@@ -17,31 +19,38 @@ enum class AttributeType(
     property = "type",
     visible = true
 )
-abstract class CreateAttributeRequest(
+sealed class AttributeDto(
+    open val id: String?,
     open val attributeName: String,
     open val shortName: String,
     open val isFaceted: Boolean,
-    open val isRequired: Boolean,
-    open val type: AttributeType
+    open val type: AttributeType,
+    open val createdAt: LocalDateTime?,
 )
 
-data class CreatePlainAttributeRequest(
+data class PlainAttributeDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
     override val attributeName: String,
     override val shortName: String,
     override val isFaceted: Boolean,
-    override val isRequired: Boolean,
     override val type: AttributeType = AttributeType.PLAIN,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val createdAt: LocalDateTime? = null,
     val values: List<AttributeValueDto>
-) : CreateAttributeRequest(attributeName, shortName, isFaceted, isRequired, type)
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt)
 
-data class CreateCompositeAttributeRequest(
+data class CompositeAttributeDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
     override val attributeName: String,
     override val shortName: String,
     override val isFaceted: Boolean,
-    override val isRequired: Boolean,
     override val type: AttributeType = AttributeType.PLAIN,
-    val values: List<CompositeValueDto>
-): CreateAttributeRequest(attributeName, shortName, isFaceted, isRequired, type)
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val createdAt: LocalDateTime? = null,
+    val values: List<CompositeAttributeValueDto>
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt)
 
 enum class AttributeValueType(
     @field:JsonValue
@@ -58,49 +67,42 @@ enum class AttributeValueType(
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type"
 )
-abstract class AttributeValueDto(
+sealed class AttributeValueDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    open val id: String?,
     open val type: AttributeValueType
 )
 
 data class StringAttributeValueDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
     val stringValue: String,
-    val stringRuValue: String,
+    val stringRuValue: String?,
     override val type: AttributeValueType = AttributeValueType.STRING_TYPE
-) : AttributeValueDto(type)
+) : AttributeValueDto(id, type)
 
 data class NumericAttributeValueDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
     val numValue: Number,
     val numRuValue: Number?,
     val numUnit: String,
     override val type: AttributeValueType = AttributeValueType.NUMERIC_TYPE
-): AttributeValueDto(type)
+) : AttributeValueDto(id, type)
 
 data class ColorAttributeValueDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
     val colorValue: String,
     val colorHex: String,
     override val type: AttributeValueType = AttributeValueType.COLOR_TYPE
-): AttributeValueDto(type)
+) : AttributeValueDto(id, type)
 
-data class CompositeValueDto(
+data class CompositeAttributeValueDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    val id: String? = null,
     val name: String,
     val value: AttributeValueDto
 )
 
-data class AttributeResponse(
-    val id: String,
-    val attributeName: String,
-    val attributeValues: List<AttributeValueResponseDto>
-)
 
-data class AttributeValueResponseDto(
-    val id: String,
-    val isComposite: Boolean,
-    val attributeValueName: String,
-    val components: List<AttributeValueComponentResponseDto>
-)
-
-data class AttributeValueComponentResponseDto(
-    val id: String,
-    val componentName: String,
-    val componentValue: String
-)

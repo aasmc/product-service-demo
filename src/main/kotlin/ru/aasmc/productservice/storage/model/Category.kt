@@ -18,7 +18,7 @@ class Category(
     val subCategories: MutableSet<Category> = hashSetOf(),
     @OneToMany(mappedBy = "category", cascade = [CascadeType.ALL])
     @org.hibernate.annotations.BatchSize(size = 10)
-    val categoryAttributes: MutableSet<Attribute> = hashSetOf(),
+    val categoryAttributes: MutableSet<CategoryAttribute> = hashSetOf(),
     @Column(name = "created_at", nullable = false)
     @org.hibernate.annotations.CreationTimestamp
     val createdAt: LocalDateTime,
@@ -26,6 +26,13 @@ class Category(
     @org.hibernate.annotations.UpdateTimestamp
     val updatedAt: LocalDateTime
 ) {
+
+    fun addAttribute(attribute: Attribute, isRequired: Boolean) {
+        check(id != null) {
+            "Category ID is null. Are you trying to add attribute to a transient entity???"
+        }
+        categoryAttributes.add(CategoryAttribute(isRequired, this, attribute))
+    }
 
     override fun toString(): String {
         return "Category(id=$id, name='$name')"

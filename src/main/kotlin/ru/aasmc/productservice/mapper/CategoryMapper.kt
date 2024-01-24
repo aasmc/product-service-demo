@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
-import ru.aasmc.productservice.dto.CreateCategoryResponse
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.storage.model.Category
 import ru.aasmc.productservice.storage.repository.CategoryAttributeRepository
@@ -44,8 +43,8 @@ class CategoryMapper(
         return newCategory
     }
 
-    fun toCreateCategoryResponse(domain: Category): CreateCategoryResponse =
-        CreateCategoryResponse(cryptoTool.hashOf(domain.id!!))
+    fun toCreateCategoryResponse(domain: Category): CategoryResponse =
+        CategoryResponse(cryptoTool.hashOf(domain.id!!))
 
     fun toCategoryResponse(domain: Category): CategoryResponse =
         CategoryResponse(

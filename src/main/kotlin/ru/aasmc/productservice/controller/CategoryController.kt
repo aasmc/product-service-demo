@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
-import ru.aasmc.productservice.dto.CreateCategoryResponse
 import ru.aasmc.productservice.service.CategoryService
 
 @RestController
@@ -22,7 +21,7 @@ class CategoryController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createCategory(@RequestBody dto: CreateCategoryRequest): CreateCategoryResponse {
+    fun createCategory(@RequestBody dto: CreateCategoryRequest): CategoryResponse {
         log.info("Received POST request to create category: {}", dto)
         return categoryService.createCategory(dto)
     }

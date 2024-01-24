@@ -50,7 +50,7 @@ class ProductMapper(
 
     fun toProductResponseDto(domain: Product): ProductResponse {
         val variants = domain.variants.map { variant ->
-            ProductVariantFullResponseDto(
+            ProductVariantResponse(
                 productId = cryptoTool.hashOf(domain.id!!),
                 variantId = cryptoTool.hashOf(variant.id!!),
                 variantName = variant.variantName,

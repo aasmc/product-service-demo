@@ -4,8 +4,7 @@ import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import ru.aasmc.productservice.dto.AttributeResponse
-import ru.aasmc.productservice.dto.CreateAttributeRequest
+import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.mapper.AttributeMapper
 import ru.aasmc.productservice.service.AttributeService
@@ -18,13 +17,13 @@ class AttributeServiceImpl(
     private val attributeRepository: AttributeRepository
 ) : AttributeService {
 
-    override fun createAttribute(dto: CreateAttributeRequest): AttributeResponse {
+    override fun createAttribute(dto: AttributeDto): AttributeDto {
         val attribute = attributeRepository.save(mapper.toDomain(dto))
         log.debug("Successfully created attribute: {}", attribute)
         return mapper.toDto(attribute)
     }
 
-    override fun getAllAttributesForCategory(categoryName: String): List<AttributeResponse> {
+    override fun getAllAttributesForCategory(categoryName: String): List<AttributeDto> {
         val attributes = attributeRepository.findByCategoryName(categoryName)
         log.debug(
             "Retrieved all attributes for category with name = {}. Attributes: {}",
@@ -34,11 +33,11 @@ class AttributeServiceImpl(
         return attributes.map(mapper::toDto)
     }
 
-    override fun getAllAttributes(): List<AttributeResponse> {
+    override fun getAllAttributes(): List<AttributeDto> {
         return attributeRepository.findAll().map(mapper::toDto)
     }
 
-    override fun getAttributeByName(name: String): AttributeResponse {
+    override fun getAttributeByName(name: String): AttributeDto {
         val attr = attributeRepository.findByName(name)
             .orElseThrow {
                 val msg = "Attribute with name=$name not found"

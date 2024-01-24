@@ -1,6 +1,8 @@
 package ru.aasmc.productservice.dto
 
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class CreateProductRequest(
     val shopId: String,
@@ -18,26 +20,17 @@ data class ProductVariantRequestDto(
     val images: ImageCollection
 )
 
-data class CreateProductResponse(
-    val productId: String,
-    val variants: List<ProductVariantShortResponseDto>
-)
-
-data class ProductVariantShortResponseDto(
-    val variantName: String,
-    val id: String
-)
-
 data class ProductResponse(
     val productId: String,
     val shopId: String,
     val categoryName: String,
     val name: String,
     val description: String,
-    val variants: List<ProductVariantFullResponseDto>
+    val createdAt: LocalDate,
+    val variants: List<ProductVariantResponse>
 )
 
-data class ProductVariantFullResponseDto(
+data class ProductVariantResponse(
     val productId: String,
     val variantId: String,
     val variantName: String,
@@ -45,4 +38,5 @@ data class ProductVariantFullResponseDto(
     val stock: Int,
     val attributes: Map<String, Any>,
     val images: ImageCollection,
+    val createdAt: LocalDateTime
 )
