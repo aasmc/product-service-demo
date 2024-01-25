@@ -57,6 +57,7 @@ class AttributeValueMapper(
                 stringValue = value.stringValue,
                 stringRuValue = value.stringRuValue
             )
+
             else -> {
                 throw RuntimeException("Invalid attribute value")
             }
@@ -143,17 +144,20 @@ class AttributeValueMapper(
         dto: NumericAttributeValueDto,
         attribute: Attribute
     ): NumericAttributeValue {
-        return numericValueRepository
-            .findByNumValueAndNumRuValueAndNumUnit(dto.numValue, dto.numRuValue, dto.numUnit)
-            .orElseGet {
-                NumericAttributeValue(
-                    attribute = attribute,
-                    compositeAttributeValue = null,
-                    numValue = dto.numValue,
-                    numRuValue = dto.numRuValue,
-                    numUnit = dto.numUnit
-                )
-            }
+        val opt = if (dto.numRuValue == null) {
+            numericValueRepository.findByNumValueAndNumUnit(dto.numValue, dto.numUnit)
+        } else {
+            numericValueRepository.findByNumValueAndNumRuValueAndNumUnit(dto.numValue, dto.numRuValue, dto.numUnit)
+        }
+        return opt.orElseGet {
+            NumericAttributeValue(
+                attribute = attribute,
+                compositeAttributeValue = null,
+                numValue = dto.numValue,
+                numRuValue = dto.numRuValue,
+                numUnit = dto.numUnit
+            )
+        }
     }
 
     private fun getColorAttributeValueOrCreate(

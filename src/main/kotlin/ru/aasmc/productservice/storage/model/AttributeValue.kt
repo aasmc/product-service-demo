@@ -13,7 +13,7 @@ abstract class AttributeValue(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)
     var attribute: Attribute,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "composite_attribute_value_id")
     var compositeAttributeValue: CompositeAttributeValue? = null
 ) {
@@ -45,9 +45,9 @@ class NumericAttributeValue(
     attribute: Attribute,
     compositeAttributeValue: CompositeAttributeValue?,
     @Column(name = "num_value")
-    var numValue: Number,
+    var numValue: Double,
     @Column(name = "num_ru_value")
-    var numRuValue: Number?,
+    var numRuValue: Double?,
     @Column(name = "num_unit")
     var numUnit: String
 ): AttributeValue(attribute = attribute, compositeAttributeValue = compositeAttributeValue)
@@ -65,14 +65,14 @@ class ColorAttributeValue(
 
 
 @Entity
-@Table(name = "composite_attribute_values")
+@Table(name = "composite_attribute_value")
 class CompositeAttributeValue(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     @Column(nullable = false, unique = true)
     var name: String,
-    @OneToOne(mappedBy = "compositeAttributeValue", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "compositeAttributeValue", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     var value: AttributeValue,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)

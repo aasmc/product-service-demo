@@ -13,6 +13,7 @@ import ru.aasmc.productservice.mapper.CategoryMapper
 import ru.aasmc.productservice.service.CategoryService
 import ru.aasmc.productservice.storage.model.Category
 import ru.aasmc.productservice.storage.model.CategoryAttribute
+import ru.aasmc.productservice.storage.repository.AttributeRepository
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.utils.CryptoTool
 
@@ -22,14 +23,16 @@ class CategoryServiceImpl(
     private val categoryRepository: CategoryRepository,
     private val mapper: CategoryMapper,
     private val cryptoTool: CryptoTool,
-    private val attributeMapper: AttributeMapper
+    private val attributeMapper: AttributeMapper,
+    private val attributeRepository: AttributeRepository
 ) : CategoryService {
 
     override fun createCategory(dto: CreateCategoryRequest): CategoryResponse {
         val category = categoryRepository.save(mapper.toDomain(dto))
         val newAttributes = dto.attributesToCreate
             .map { attrDto ->
-                val attr = attributeMapper.toDomain(attrDto)
+                var attr = attributeMapper.toDomain(attrDto)
+                attr = attributeRepository.save(attr)
                 CategoryAttribute(
                     isRequired = attrDto.isRequired,
                     category = category,

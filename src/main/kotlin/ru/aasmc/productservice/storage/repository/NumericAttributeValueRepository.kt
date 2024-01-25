@@ -6,6 +6,8 @@ import java.util.Optional
 
 interface NumericAttributeValueRepository: JpaRepository<NumericAttributeValue, Long> {
 
-    fun findByNumValueAndNumRuValueAndNumUnit(numValue: Number, numRuValue: Number?, numUnit: String): Optional<NumericAttributeValue>
+    fun findByNumValueAndNumRuValueAndNumUnit(numValue: Number, numRuValue: Number, numUnit: String): Optional<NumericAttributeValue>
+
+    fun findByNumValueAndNumUnit(numValue: Number, numUnit: String): Optional<NumericAttributeValue>
 
 }

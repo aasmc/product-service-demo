@@ -1,6 +1,7 @@
 package ru.aasmc.productservice.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonValue
 import java.time.LocalDateTime
@@ -19,6 +20,16 @@ enum class AttributeType(
     property = "type",
     visible = true
 )
+@JsonSubTypes(*arrayOf(
+    JsonSubTypes.Type(
+        value = PlainAttributeDto::class,
+        name = "plain"
+    ),
+    JsonSubTypes.Type(
+        value = CompositeAttributeDto::class,
+        name = "composite"
+    )
+))
 sealed class AttributeDto(
     open val id: String?,
     open val attributeName: String,
@@ -48,7 +59,7 @@ data class CompositeAttributeDto(
     override val attributeName: String,
     override val shortName: String,
     override val isFaceted: Boolean,
-    override val type: AttributeType = AttributeType.PLAIN,
+    override val type: AttributeType = AttributeType.COMPOSITE,
     override val isRequired: Boolean = false,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
@@ -70,6 +81,22 @@ enum class AttributeValueType(
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type"
 )
+@JsonSubTypes(
+    *arrayOf(
+        JsonSubTypes.Type(
+            value = StringAttributeValueDto::class,
+            name = "string_type"
+        ),
+        JsonSubTypes.Type(
+            value = NumericAttributeValueDto::class,
+            name = "numeric_type"
+        ),
+        JsonSubTypes.Type(
+            value = ColorAttributeValueDto::class,
+            name = "color_type"
+        )
+    )
+)
 sealed class AttributeValueDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     open val id: String?,
@@ -87,8 +114,8 @@ data class StringAttributeValueDto(
 data class NumericAttributeValueDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val id: String? = null,
-    val numValue: Number,
-    val numRuValue: Number?,
+    val numValue: Double,
+    val numRuValue: Double?,
     val numUnit: String,
     override val type: AttributeValueType = AttributeValueType.NUMERIC_TYPE
 ) : AttributeValueDto(id, type)

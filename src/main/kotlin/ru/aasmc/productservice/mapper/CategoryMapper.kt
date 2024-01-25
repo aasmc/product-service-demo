@@ -47,6 +47,7 @@ class CategoryMapper(
     fun toCategoryResponse(domain: Category): CategoryResponse =
         CategoryResponse(
             categoryId = cryptoTool.hashOf(domain.id!!),
+            name = domain.name,
             parentId = domain.parent?.id?.let { cryptoTool.hashOf(it) },
             subcategoryNames = domain.subCategories.map { it.name },
             attributes = domain.categoryAttributes.map { categoryAttribute ->
