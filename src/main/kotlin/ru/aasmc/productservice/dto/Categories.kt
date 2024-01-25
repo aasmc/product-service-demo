@@ -12,7 +12,7 @@ data class CreateCategoryRequest(
 data class CategoryResponse(
     val categoryId: String,
     val parentId: String?,
-    val subCategoriesIds: List<String>,
+    val subcategoryNames: List<String>,
     val createdAt: LocalDateTime,
     val attributes: List<AttributeDto>
 )

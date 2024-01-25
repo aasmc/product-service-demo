@@ -7,8 +7,8 @@ interface ShopService {
 
     fun createShop(dto: CreateShopRequest): ShopResponse
 
-    fun getShopByIdWithoutProducts(hashedId: String): ShopResponse
-
     fun getShopByIdWithProducts(hashedId: String): ShopResponse
+
+    fun getShopsForSeller(sellerId: String): List<ShopResponse>
 
 }

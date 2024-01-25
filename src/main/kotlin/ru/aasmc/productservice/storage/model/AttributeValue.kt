@@ -6,7 +6,7 @@ import jakarta.persistence.*
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "attribute_values")
 @DiscriminatorColumn(name = "av_type")
-sealed class AttributeValue(
+abstract class AttributeValue(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,

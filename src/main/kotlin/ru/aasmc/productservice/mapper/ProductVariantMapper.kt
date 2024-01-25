@@ -40,7 +40,8 @@ class ProductVariantMapper(
             price = domain.price,
             stock = domain.stock,
             attributes = domain.attributes,
-            images = domain.images
+            images = domain.images,
+            createdAt = domain.createdAt!!
         )
 
 

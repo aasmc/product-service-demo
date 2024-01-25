@@ -11,4 +11,6 @@ interface ShopRepository: JpaRepository<Shop, Long> {
     @Query("select s from Shop s join fetch s.seller seller where s.id = :id")
     fun findShopByIdWithSeller(@Param("id") id: Long): Optional<Shop>
 
+    fun findAllBySeller_Id(sellerId: Long): List<Shop>
+
 }

@@ -21,17 +21,15 @@ class Product(
     @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL])
     @BatchSize(size = 10)
     val variants: MutableSet<ProductVariant> = hashSetOf(),
-    @Column(name = "created_at")
-    @org.hibernate.annotations.CreationTimestamp
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "updated_at")
-    @org.hibernate.annotations.UpdateTimestamp
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+
 ) {
 
-    fun addVariant(variant: ProductVariant) {
-        variants.add(variant)
-    }
+    @Column(name = "created_at")
+    @org.hibernate.annotations.CreationTimestamp
+    var createdAt: LocalDateTime? = null
+    @Column(name = "updated_at")
+    @org.hibernate.annotations.UpdateTimestamp
+    var updatedAt: LocalDateTime? = null
 
     override fun toString(): String {
         return "Product(id=$id, name='$name', description='$description')"

@@ -41,7 +41,6 @@ CREATE TABLE attributes(
     updated_at TIMESTAMP NOT NULL
 );
 
-CREATE INDEX attributes_category_id_idx ON attributes(category_id);
 CREATE INDEX attributes_updated_at_idx ON attributes(updated_at);
 
 CREATE TABLE category_attributes(
@@ -56,6 +55,8 @@ CREATE TABLE composite_attribute_value(
     attribute_id BIGINT NOT NULL REFERENCES attributes(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL UNIQUE
 );
+
+CREATE INDEX composite_attribute_value_attribute_id_idx ON composite_attribute_value(attribute_id);
 
 CREATE TABLE attribute_values(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

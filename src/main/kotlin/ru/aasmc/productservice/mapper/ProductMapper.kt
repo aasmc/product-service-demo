@@ -28,25 +28,14 @@ class ProductMapper(
             name = dto.name,
             description = dto.description
         )
-        dto.variants.map { variant ->
+        val variants = dto.variants.map { variant ->
             productVariantMapper.toDomain(variant, product)
         }
+        product.variants.addAll(variants)
         shop.products.add(product)
         return product
     }
 
-    fun toCreateDto(domain: Product): CreateProductResponse {
-        val variants = domain.variants.map { variant ->
-            ProductVariantShortResponseDto(
-                variantName = variant.variantName,
-                id = cryptoTool.hashOf(variant.id!!)
-            )
-        }
-        return CreateProductResponse(
-            productId = cryptoTool.hashOf(domain.id!!),
-            variants = variants
-        )
-    }
 
     fun toProductResponseDto(domain: Product): ProductResponse {
         val variants = domain.variants.map { variant ->
@@ -57,7 +46,8 @@ class ProductMapper(
                 price = variant.price,
                 stock = variant.stock,
                 attributes = variant.attributes,
-                images = variant.images
+                images = variant.images,
+                createdAt = variant.createdAt!!
             )
         }
         return ProductResponse(
@@ -66,7 +56,8 @@ class ProductMapper(
             categoryName = domain.category.name,
             name = domain.name,
             description = domain.description,
-            variants = variants
+            variants = variants,
+            createdAt = domain.createdAt!!
         )
     }
 

@@ -26,6 +26,7 @@ sealed class AttributeDto(
     open val isFaceted: Boolean,
     open val type: AttributeType,
     open val createdAt: LocalDateTime?,
+    open val isRequired: Boolean
 )
 
 data class PlainAttributeDto(
@@ -35,10 +36,11 @@ data class PlainAttributeDto(
     override val shortName: String,
     override val isFaceted: Boolean,
     override val type: AttributeType = AttributeType.PLAIN,
+    override val isRequired: Boolean = false,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val values: List<AttributeValueDto>
-) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt)
+    val availableValues: List<AttributeValueDto>,
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
 
 data class CompositeAttributeDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
@@ -47,10 +49,11 @@ data class CompositeAttributeDto(
     override val shortName: String,
     override val isFaceted: Boolean,
     override val type: AttributeType = AttributeType.PLAIN,
+    override val isRequired: Boolean = false,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val values: List<CompositeAttributeValueDto>
-) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt)
+    val availableValues: List<CompositeAttributeValueDto>
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
 
 enum class AttributeValueType(
     @field:JsonValue

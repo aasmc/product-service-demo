@@ -25,14 +25,14 @@ class ShopServiceImpl(
         return mapper.toFullResponse(shop)
     }
 
-    override fun getShopByIdWithoutProducts(hashedId: String): ShopResponse {
+    override fun getShopByIdWithProducts(hashedId: String): ShopResponse {
         val shop = getShopOrThrow(hashedId)
         return mapper.toFullResponse(shop)
     }
 
-    override fun getShopByIdWithProducts(hashedId: String): ShopResponse {
-        val shop = getShopOrThrow(hashedId)
-        return mapper.toFullResponse(shop)
+    override fun getShopsForSeller(sellerId: String): List<ShopResponse> {
+        return shopRepository.findAllBySeller_Id(cryptoTool.idOf(sellerId))
+            .map(mapper::toFullResponse)
     }
 
     private fun getShopOrThrow(hashedId: String): Shop {

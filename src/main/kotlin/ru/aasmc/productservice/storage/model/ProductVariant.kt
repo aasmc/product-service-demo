@@ -26,17 +26,15 @@ class ProductVariant(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
-    @Column(name = "created_at")
-    @org.hibernate.annotations.CreationTimestamp
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "updated_at")
-    @org.hibernate.annotations.UpdateTimestamp
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+
 ) {
 
-    init {
-        product.addVariant(this)
-    }
+    @Column(name = "created_at")
+    @org.hibernate.annotations.CreationTimestamp
+    var createdAt: LocalDateTime? = null
+    @Column(name = "updated_at")
+    @org.hibernate.annotations.UpdateTimestamp
+    var updatedAt: LocalDateTime? = null
 
     override fun toString(): String {
         return "ProductVariant(id=$id, price=$price, stock=$stock, attributes=$attributes, images=$images)"

@@ -18,13 +18,8 @@ class ShopController(
         return shopService.createShop(dto)
     }
 
-    @GetMapping("/{shopId}")
-    fun getShopWithoutProducts(@PathVariable("shopId") shopId: String): ShopResponse {
-        log.info("Received received to GET shop without products. Shop ID={}", shopId)
-        return shopService.getShopByIdWithoutProducts(shopId)
-    }
 
-    @GetMapping("/full/{shopId}")
+    @GetMapping("/{shopId}")
     fun getShopWithProducts(@PathVariable("shopId") shopId: String): ShopResponse {
         log.info("Received request to GET shop with products. Shop ID={}", shopId)
         return shopService.getShopByIdWithProducts(shopId)

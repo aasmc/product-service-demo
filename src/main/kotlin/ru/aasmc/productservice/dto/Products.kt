@@ -1,7 +1,6 @@
 package ru.aasmc.productservice.dto
 
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CreateProductRequest(
@@ -26,7 +25,7 @@ data class ProductResponse(
     val categoryName: String,
     val name: String,
     val description: String,
-    val createdAt: LocalDate,
+    val createdAt: LocalDateTime,
     val variants: List<ProductVariantResponse>
 )
 

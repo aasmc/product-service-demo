@@ -14,7 +14,8 @@ import ru.aasmc.productservice.utils.CryptoTool
 class CategoryMapper(
     private val cryptoTool: CryptoTool,
     private val categoryRepository: CategoryRepository,
-    private val categoryAttributeRepository: CategoryAttributeRepository
+    private val categoryAttributeRepository: CategoryAttributeRepository,
+    private val attributeMapper: AttributeMapper
 ) {
 
     fun toDomain(dto: CreateCategoryRequest): Category {
@@ -26,10 +27,10 @@ class CategoryMapper(
                 ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
             }
 
-        val categoryAttributes = dto.attributeNames.map { attributeName ->
-            categoryAttributeRepository.findByAttribute_Name(attributeName)
+        val categoryAttributes = dto.selectedAttributeIds.map { attrId ->
+            categoryAttributeRepository.findById(cryptoTool.idOf(attrId))
                 .orElseThrow {
-                    val msg = "CategoryAttribute with name=$attributeName not found"
+                    val msg = "CategoryAttribute with id=$attrId not found"
                     ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
                 }
         }.toHashSet()
@@ -43,14 +44,15 @@ class CategoryMapper(
         return newCategory
     }
 
-    fun toCreateCategoryResponse(domain: Category): CategoryResponse =
-        CategoryResponse(cryptoTool.hashOf(domain.id!!))
-
     fun toCategoryResponse(domain: Category): CategoryResponse =
         CategoryResponse(
             categoryId = cryptoTool.hashOf(domain.id!!),
-            parentCategoryId = domain.parent?.id?.let { cryptoTool.hashOf(it) },
-            attributeNames = domain.categoryAttributes.map { it.attribute.name }
+            parentId = domain.parent?.id?.let { cryptoTool.hashOf(it) },
+            subcategoryNames = domain.subCategories.map { it.name },
+            attributes = domain.categoryAttributes.map { categoryAttribute ->
+                attributeMapper.toDto(categoryAttribute.attribute)
+            },
+            createdAt = domain.createdAt!!
         )
 
     fun toCategoryResponseList(categories: List<Category>): List<CategoryResponse> =
