@@ -34,7 +34,7 @@ class CategoryServiceImpl(
                 var attr = attributeMapper.toDomain(attrDto)
                 attr = attributeRepository.save(attr)
                 CategoryAttribute(
-                    isRequired = attrDto.isRequired,
+                    isRequired = attrDto.isRequired ?: false,
                     category = category,
                     attribute = attr
                 )
@@ -57,10 +57,11 @@ class CategoryServiceImpl(
 
     override fun addAttributeToCategory(dto: AttributeDto, categoryId: String): CategoryResponse {
         val category = getCategoryOrThrow(categoryId)
-        val attribute = attributeMapper.toDomain(dto)
+        var attribute = attributeMapper.toDomain(dto)
+        attribute = attributeRepository.save(attribute)
         category.categoryAttributes.add(
             CategoryAttribute(
-                isRequired = dto.isRequired,
+                isRequired = dto.isRequired ?: false,
                 category = category,
                 attribute = attribute
             )

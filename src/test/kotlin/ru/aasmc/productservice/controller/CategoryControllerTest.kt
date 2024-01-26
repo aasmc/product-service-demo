@@ -7,7 +7,6 @@ import org.springframework.http.MediaType
 import ru.aasmc.productservice.BaseIntegTest
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CompositeAttributeDto
-import ru.aasmc.productservice.dto.CompositeAttributeValueDto
 import ru.aasmc.productservice.dto.PlainAttributeDto
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.testdata.*
@@ -20,7 +19,40 @@ class CategoryControllerTest @Autowired constructor (
 ): BaseIntegTest() {
 
     @Test
-    fun testCreateSubCategory() {
+    fun whenAddAttributeToCategory_addsAttributeToCategory() {
+        var topLevel = topLevelCategoryDomain()
+        topLevel = categoryRepository.save(topLevel)
+        val topLevelIdStr = cryptoTool.hashOf(topLevel.id!!)
+        val dimensAttrDto = dimensionsAttributeDto()
+
+        webTestClient
+            .put()
+            .uri("$BASE_CATEGORIES_URL/$topLevelIdStr/attributes")
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(dimensAttrDto)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(CategoryResponse::class.java)
+            .value { response ->
+                assertThat(response.attributes).hasSize(1)
+                val dimensAttr = response.attributes[0] as CompositeAttributeDto
+                assertThat(dimensAttr.availableValues).hasSize(3)
+                val dimenValues = dimensAttr.availableValues
+                    .sortedBy { it.name }
+                val depth = dimenValues[0]
+                val length = dimenValues[1]
+                val width = dimenValues[2]
+                assertThat(depth.name).isEqualTo(DIMENS_DEPTH_NAME)
+                assertThat(depth.values).hasSize(3)
+                assertThat(width.name).isEqualTo(DIMENS_WIDTH_NAME)
+                assertThat(width.values).hasSize(3)
+                assertThat(length.name).isEqualTo(DIMENS_LENGTH_NAME)
+                assertThat(length.values).hasSize(3)
+            }
+    }
+
+    @Test
+    fun whenCreateSubCategoryWithAttributes_successfullyCreatesASubCategoryAndAllAttributes() {
         var topLevel = topLevelCategoryDomain()
         topLevel = categoryRepository.save(topLevel)
         val topLevelIdStr = cryptoTool.hashOf(topLevel.id!!)
@@ -62,6 +94,19 @@ class CategoryControllerTest @Autowired constructor (
                 assertThat(width.values).hasSize(3)
                 assertThat(length.name).isEqualTo(DIMENS_LENGTH_NAME)
                 assertThat(length.values).hasSize(3)
+            }
+
+        webTestClient.get()
+            .uri("$BASE_CATEGORIES_URL/$topLevelIdStr")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(CategoryResponse::class.java)
+            .value { topLevelResponse ->
+                assertThat(topLevelResponse.categoryId).isEqualTo(topLevelIdStr)
+                assertThat(topLevelResponse.name).isEqualTo(TEST_TOP_LEVEL_CATEGORY_NAME)
+                assertThat(topLevelResponse.subcategoryNames).hasSize(1)
+                assertThat(topLevelResponse.subcategoryNames[0]).isEqualTo(TEST_SUBCATEGORY_NAME)
             }
     }
 

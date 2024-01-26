@@ -56,8 +56,8 @@ class CategoryAttribute(
 
     override fun equals(other: Any?): Boolean {
         val o = other as? CategoryAttribute ?: return false
-        return id.categoryId != null && id.categoryId == o.id.categoryId &&
-                id.attributeId != null && id.attributeId == o.id.attributeId
+        return id.categoryId == o.id.categoryId &&
+                id.attributeId == o.id.attributeId
     }
 
     override fun hashCode(): Int {

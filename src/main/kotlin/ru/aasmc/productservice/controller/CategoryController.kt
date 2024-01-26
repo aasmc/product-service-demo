@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
 import ru.aasmc.productservice.service.CategoryService
@@ -36,6 +38,15 @@ class CategoryController(
     fun getAllCategories(): List<CategoryResponse> {
         log.info("Received request to GET all categories")
         return categoryService.getAllCategories()
+    }
+
+    @PutMapping("/{id}/attributes")
+    fun addAttributeToCategory(
+        @PathVariable("id") categoryId: String,
+        @RequestBody dto: AttributeDto
+    ): CategoryResponse {
+        log.info("Received PUT request to add attribute: {}, to category with ID={}", dto, categoryId)
+        return categoryService.addAttributeToCategory(dto, categoryId)
     }
 
     companion object {

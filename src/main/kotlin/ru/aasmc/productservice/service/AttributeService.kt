@@ -16,12 +16,12 @@ interface AttributeService {
 
     fun addAttributeValue(
         attributeId: String,
-        dto: AttributeValueDto
+        dto: AttributeValueDto,
     ): AttributeValueDto
 
     fun addCompositeAttributeValue(
         attributeId: String,
-        dto: CompositeAttributeValueDto
+        dto: CompositeAttributeValueDto,
     ): CompositeAttributeValueDto
 
 }

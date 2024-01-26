@@ -4,6 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import ru.aasmc.productservice.dto.AttributeDto
+import ru.aasmc.productservice.dto.AttributeValueDto
+import ru.aasmc.productservice.dto.CompositeAttributeValueDto
 import ru.aasmc.productservice.service.AttributeService
 
 @RestController
@@ -37,6 +39,24 @@ class AttributeController(
     fun getAttributeByName(@PathVariable("name") name: String): AttributeDto {
         log.info("Received request to GET attribute by name: {}", name)
         return attributeService.getAttributeByName(name)
+    }
+
+    @PutMapping("/{id}/value")
+    fun addAttributeValue(
+        @PathVariable("id") attrId: String,
+        @RequestBody dto: AttributeValueDto,
+    ): AttributeValueDto {
+        log.info("Received PUT request to add value: {}, to attribute with ID={}", dto, attrId)
+        return attributeService.addAttributeValue(attrId, dto)
+    }
+
+    @PutMapping("/{id}/compositeValue")
+    fun addCompositeAttributeValue(
+        @PathVariable("id") attrId: String,
+        @RequestBody dto: CompositeAttributeValueDto,
+    ): CompositeAttributeValueDto {
+        log.info("Received PUT request to add composite value: {}, to attribute with ID={}", dto, attrId)
+        return attributeService.addCompositeAttributeValue(attrId, dto)
     }
 
     companion object {

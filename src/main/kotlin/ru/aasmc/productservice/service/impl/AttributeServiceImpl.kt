@@ -62,7 +62,7 @@ class AttributeServiceImpl(
 
     override fun addAttributeValue(
         attributeId: String,
-        dto: AttributeValueDto
+        dto: AttributeValueDto,
     ): AttributeValueDto {
         val attr = getAttributeOrThrow(attributeId)
         val attributeValue = attributeValueMapper.toDomain(dto, attr)
@@ -73,7 +73,7 @@ class AttributeServiceImpl(
 
     override fun addCompositeAttributeValue(
         attributeId: String,
-        dto: CompositeAttributeValueDto
+        dto: CompositeAttributeValueDto,
     ): CompositeAttributeValueDto {
         val attribute = getAttributeOrThrow(attributeId)
         if (!attribute.isComposite) {
