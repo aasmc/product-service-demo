@@ -2,28 +2,35 @@ package ru.aasmc.productservice.testdata
 
 import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.storage.model.*
+import java.math.BigDecimal
 
 fun topLevelCategoryRequest(): CreateCategoryRequest =
     CreateCategoryRequest(
-        name = TEST_TOP_LEVEL_CATEGORY_NAME
+        name = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME
+    )
+
+fun topLevelCategoryWithAttributes(): CreateCategoryRequest =
+    CreateCategoryRequest(
+        name = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME,
+        attributesToCreate = sizeDimensionsColorsAttributes()
     )
 
 fun topLevelCategoryRequestWithSelectedAttributes(
     ids: Set<SelectedAttribute>
 ) = CreateCategoryRequest(
-    name = TEST_TOP_LEVEL_CATEGORY_NAME,
+    name = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME,
     selectedAttributeIds = ids
 )
 
 fun subCategoryRequestWithAttributesToCreate(parentId: String) = CreateCategoryRequest(
-    name = TEST_SUBCATEGORY_NAME,
+    name = TEST_SUBCATEGORY_T_SHIRTS_NAME,
     parentId = parentId,
     attributesToCreate = categoryAttributesToCreate()
 )
 
 fun topLevelCategoryDomain(): Category =
     Category(
-        name = TEST_TOP_LEVEL_CATEGORY_NAME
+        name = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME
     )
 
 
@@ -32,6 +39,12 @@ fun categoryAttributesToCreate(): List<AttributeDto> =
         sizeAttributeDto(true),
         dimensionsAttributeDto(true)
     )
+
+fun sizeDimensionsColorsAttributes(): List<AttributeDto> = listOf(
+    sizeAttributeDto(true),
+    dimensionsAttributeDto(true),
+    colorAttributeRequest()
+)
 
 
 fun dimensionsAttributeDto(isRequired: Boolean) = CompositeAttributeDto(
@@ -301,5 +314,160 @@ fun sizeAttributeStringValues(): List<AttributeValueDto> =
             stringValue = SIZE_XXL_VALUE,
             stringRuValue = SIZE_54_VALUE
         ),
+    )
 
+fun createSellerRequest() = CreateSellerRequest(
+    firstName = SELLER_TEST_NAME,
+    lastName = SELLER_TEST_LASTNAME
+)
+
+fun sellerDomain() = Seller(
+    firstName = SELLER_TEST_NAME,
+    lastName = SELLER_TEST_LASTNAME
+)
+
+fun createShopRequest(sellerId: String) = CreateShopRequest(
+    sellerId,
+    name = SHOP_TEST_NAME,
+    description = SHOP_TEST_DESCRIPTION
+)
+
+fun shopDomain(seller: Seller) = Shop(
+    seller = seller,
+    name = SHOP_TEST_NAME,
+    description = SHOP_TEST_DESCRIPTION
+)
+
+fun createTshirtRequest(
+    shopId: String,
+    blueAttributes: List<AttributeDto>,
+    redAttributes: List<AttributeDto>,
+    greenAttributes: List<AttributeDto>
+) = CreateProductRequest(
+    shopId = shopId,
+    categoryName = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME,
+    name = PRODUCT_T_SHIRT_NAME,
+    description = PRODUCT_T_SHIRT_DESCRIPTION,
+    variants = tShirtVariantDtos(blueAttributes, redAttributes, greenAttributes)
+)
+
+fun colorAttributeRequest(): AttributeDto = PlainAttributeDto(
+    attributeName = COLOR_ATTR_NAME,
+    shortName = COLOR_ATTR_NAME,
+    isFaceted = true,
+    availableValues = listOf(
+        ColorAttributeValueDto(
+            colorValue = BLUE,
+            colorHex = BLUE_HEX
+        ),
+        ColorAttributeValueDto(
+            colorValue = RED,
+            colorHex = RED_HEX
+        ),
+        ColorAttributeValueDto(
+            colorValue = GREEN,
+            colorHex = GREEN_HEX
         )
+    )
+)
+
+fun colorAttributeDomain(): Attribute {
+    val attr = Attribute(
+        name = COLOR_ATTR_NAME,
+        shortName = COLOR_ATTR_NAME,
+        isFaceted = true,
+        isComposite = false
+    )
+    attr.attributeValues.addAll(listOf(
+        ColorAttributeValue(
+            attribute = attr,
+            colorValue = BLUE,
+            colorHex = BLUE_HEX,
+            compositeAttributeValue = null
+        ),
+        ColorAttributeValue(
+            attribute = attr,
+            colorValue = RED,
+            colorHex = RED_HEX,
+            compositeAttributeValue = null
+        ),
+        ColorAttributeValue(
+            attribute = attr,
+            colorValue = GREEN,
+            colorHex = GREEN_HEX,
+            compositeAttributeValue = null
+        )
+    ))
+    return attr
+}
+
+fun tShirtVariantDtos(
+    blueAttributes: List<AttributeDto>,
+    redAttributes: List<AttributeDto>,
+    greenAttributes: List<AttributeDto>
+): Set<ProductVariantRequestDto> =
+    hashSetOf(
+        blueTShirtVariantDto(blueAttributes),
+        greenTShirtVariantDto(greenAttributes),
+        redTShirtVariantDto(redAttributes)
+    )
+
+fun blueTShirtVariantDto(
+    attributes: List<AttributeDto>
+) = ProductVariantRequestDto(
+    variantName = T_SHIRT_BLUE_VARIANT_NAME,
+    price = BigDecimal.TEN,
+    stock = 10,
+    images = ImageCollection(
+        images = arrayListOf(
+            AppImage(
+                url = "http://imageurl.com/blue-image-primary.png",
+                isPrimary = true
+            ),
+            AppImage(
+                url = "http://imageurl.com/blue-image-secondary.png"
+            )
+        )
+    ),
+    attributes = attributes
+)
+
+fun redTShirtVariantDto(
+    attributes: List<AttributeDto>
+) = ProductVariantRequestDto(
+    variantName = T_SHIRT_RED_VARIANT_NAME,
+    price = BigDecimal.TEN,
+    stock = 10,
+    images = ImageCollection(
+        images = arrayListOf(
+            AppImage(
+                url = "http://imageurl.com/red-image-primary.png",
+                isPrimary = true
+            ),
+            AppImage(
+                url = "http://imageurl.com/red-image-secondary.png"
+            )
+        )
+    ),
+    attributes = attributes
+)
+
+fun greenTShirtVariantDto(
+    attributes: List<AttributeDto>
+) = ProductVariantRequestDto(
+    variantName = T_SHIRT_GREEN_VARIANT_NAME,
+    price = BigDecimal.TEN,
+    stock = 10,
+    images = ImageCollection(
+        images = arrayListOf(
+            AppImage(
+                url = "http://imageurl.com/green-image-primary.png",
+                isPrimary = true
+            ),
+            AppImage(
+                url = "http://imageurl.com/green-image-secondary.png"
+            )
+        )
+    ),
+    attributes = attributes
+)

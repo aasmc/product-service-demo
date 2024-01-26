@@ -17,8 +17,9 @@ class ProductVariantMapper(
 ) {
 
     fun toDomain(dto: ProductVariantRequestDto, product: Product): ProductVariant {
-        val attrCount = attributeRepository.countByNameIn(dto.attributes.keys)
-        if (attrCount != dto.attributes.keys.size.toLong()) {
+        val names = dto.attributes.map { it.attributeName }.toSet()
+        val attrCount = attributeRepository.countByNameIn(names)
+        if (attrCount != dto.attributes.size.toLong()) {
             val msg = "Cannot create product variant, because not all attributes exist."
             throw ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
         }
@@ -26,7 +27,7 @@ class ProductVariantMapper(
             variantName = dto.variantName,
             price = dto.price,
             stock = dto.stock,
-            attributes = dto.attributes,
+            attributes = dto.attributes.toMutableList(),
             images = dto.images,
             product = product
         )

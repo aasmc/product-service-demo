@@ -27,6 +27,8 @@ class ProductServiceImpl(
 ): ProductService {
 
     override fun createProduct(dto: CreateProductRequest): ProductResponse {
+        // TODO discuss whether we need to check if all required attributes of
+        // category have been filled, or is a check-up on front enough?
         val product = productRepository.save(mapper.toDomain(dto))
         log.debug("Successfully saved product: {}", product)
         productOutboxService.addEvent(product.id!!, product, EventType.INSERT)

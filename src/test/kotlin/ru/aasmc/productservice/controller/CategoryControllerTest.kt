@@ -101,7 +101,7 @@ class CategoryControllerTest @Autowired constructor (
             .expectBody(CategoryResponse::class.java)
             .value { response ->
                 assertThat(response.categoryId).isNotNull()
-                assertThat(response.name).isEqualTo(TEST_SUBCATEGORY_NAME)
+                assertThat(response.name).isEqualTo(TEST_SUBCATEGORY_T_SHIRTS_NAME)
                 assertThat(response.parentId).isEqualTo(topLevelIdStr)
                 assertThat(response.subcategoryNames).isEmpty()
                 assertThat(response.createdAt).isNotNull()
@@ -138,9 +138,9 @@ class CategoryControllerTest @Autowired constructor (
             .expectBody(CategoryResponse::class.java)
             .value { topLevelResponse ->
                 assertThat(topLevelResponse.categoryId).isEqualTo(topLevelIdStr)
-                assertThat(topLevelResponse.name).isEqualTo(TEST_TOP_LEVEL_CATEGORY_NAME)
+                assertThat(topLevelResponse.name).isEqualTo(TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME)
                 assertThat(topLevelResponse.subcategoryNames).hasSize(1)
-                assertThat(topLevelResponse.subcategoryNames[0]).isEqualTo(TEST_SUBCATEGORY_NAME)
+                assertThat(topLevelResponse.subcategoryNames[0]).isEqualTo(TEST_SUBCATEGORY_T_SHIRTS_NAME)
             }
     }
 
@@ -157,7 +157,7 @@ class CategoryControllerTest @Autowired constructor (
             .expectBody(CategoryResponse::class.java)
             .value { response ->
                 assertThat(response.categoryId).isNotNull()
-                assertThat(response.name).isEqualTo(TEST_TOP_LEVEL_CATEGORY_NAME)
+                assertThat(response.name).isEqualTo(TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME)
                 assertThat(response.subcategoryNames).isEmpty()
                 assertThat(response.createdAt).isAfter(now)
             }
