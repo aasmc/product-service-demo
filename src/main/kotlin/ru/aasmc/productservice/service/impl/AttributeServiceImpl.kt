@@ -14,6 +14,8 @@ import ru.aasmc.productservice.mapper.AttributeValueMapper
 import ru.aasmc.productservice.service.AttributeService
 import ru.aasmc.productservice.storage.model.Attribute
 import ru.aasmc.productservice.storage.repository.AttributeRepository
+import ru.aasmc.productservice.storage.repository.CategoryAttributeRepository
+import ru.aasmc.productservice.storage.repository.CompositeAttributeValueRepository
 import ru.aasmc.productservice.utils.CryptoTool
 
 @Service
@@ -21,8 +23,10 @@ import ru.aasmc.productservice.utils.CryptoTool
 class AttributeServiceImpl(
     private val mapper: AttributeMapper,
     private val attributeRepository: AttributeRepository,
+    private val categoryAttributeRepository: CategoryAttributeRepository,
     private val attributeValueMapper: AttributeValueMapper,
-    private val cryptoTool: CryptoTool
+    private val cryptoTool: CryptoTool,
+    private val compositeAttributeValueRepository: CompositeAttributeValueRepository
 ) : AttributeService {
 
     override fun createAttribute(dto: AttributeDto): AttributeDto {
@@ -34,17 +38,18 @@ class AttributeServiceImpl(
 
         }
         log.debug("Successfully created attribute: {}", attribute)
-        return mapper.toDto(attribute)
+        return mapper.toDto(attribute, dto.isRequired)
     }
 
     override fun getAllAttributesForCategory(categoryName: String): List<AttributeDto> {
-        val attributes = attributeRepository.findByCategoryName(categoryName)
+        val attributes = categoryAttributeRepository
+            .findByCategory_Name(categoryName)
         log.debug(
             "Retrieved all attributes for category with name = {}. Attributes: {}",
             categoryName,
             attributes
         )
-        return attributes.map(mapper::toDto)
+        return attributes.map{ cAttr -> mapper.toDto(cAttr.attribute, cAttr.isRequired)}
     }
 
     override fun getAllAttributes(): List<AttributeDto> {
@@ -65,9 +70,18 @@ class AttributeServiceImpl(
         dto: AttributeValueDto,
     ): AttributeValueDto {
         val attr = getAttributeOrThrow(attributeId)
+        if (attr.isComposite) {
+            val msg = "The attribute with ID=$attributeId is composite, " +
+                    "and you are trying to add a simple value: $dto."
+            throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
+        }
         val attributeValue = attributeValueMapper.toDomain(dto, attr)
         attr.attributeValues.add(attributeValue)
         log.debug("Successfully added value: {}, to attribute with ID={}", dto, attributeId)
+        // if we don't flush here, attributeValue will not have an ID, because hibernate
+        // defers saving it to DB until the end of transaction. But the ID is necessary
+        // for attributeValueMapper.toDto(attributeValue)
+        attributeRepository.flush()
         return attributeValueMapper.toDto(attributeValue)
     }
 
@@ -84,7 +98,24 @@ class AttributeServiceImpl(
             .toCompositeDomain(dto, attribute)
         attribute.compositeAttributeValues.add(compositeValue)
         log.debug("Successfully added composite value: {}, to attribute with ID={}", dto, attributeId)
+        attributeRepository.flush()
         return attributeValueMapper.toCompositeDto(compositeValue)
+    }
+
+    override fun addValueToCompositeAttributeValue(
+        compositeValueId: String,
+        dto: AttributeValueDto
+    ): AttributeValueDto {
+        val composite = compositeAttributeValueRepository
+            .findById(cryptoTool.idOf(compositeValueId))
+            .orElseThrow {
+                val msg = "Composite Attribute Value with ID=$compositeValueId not found."
+                throw ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
+            }
+        val value = attributeValueMapper.toDomain(dto, composite.attribute)
+        composite.value.add(value)
+        attributeRepository.flush()
+        return attributeValueMapper.toDto(value)
     }
 
     private fun getAttributeOrThrow(attributeId: String): Attribute = attributeRepository.findById(cryptoTool.idOf(attributeId))

@@ -23,7 +23,7 @@ class AttributeMapper(
         return attribute
     }
 
-    fun toDto(domain: Attribute): AttributeDto {
+    fun toDto(domain: Attribute, isRequired: Boolean? = null): AttributeDto {
         return if (domain.isComposite) {
             CompositeAttributeDto(
                 id = cryptoTool.hashOf(domain.id!!),
@@ -32,7 +32,8 @@ class AttributeMapper(
                 isFaceted = domain.isFaceted,
                 createdAt = domain.createdAt,
                 availableValues = attributeValueMapper
-                    .compositeToDtoList(domain.compositeAttributeValues)
+                    .compositeToDtoList(domain.compositeAttributeValues),
+                isRequired = isRequired
             )
         } else {
             PlainAttributeDto(
@@ -42,7 +43,8 @@ class AttributeMapper(
                 isFaceted = domain.isFaceted,
                 createdAt = domain.createdAt,
                 availableValues = attributeValueMapper
-                    .toDtoList(domain.attributeValues)
+                    .toDtoList(domain.attributeValues),
+                isRequired = isRequired
             )
         }
     }

@@ -24,4 +24,9 @@ interface AttributeService {
         dto: CompositeAttributeValueDto,
     ): CompositeAttributeValueDto
 
+    fun addValueToCompositeAttributeValue(
+        compositeValueId: String,
+        dto: AttributeValueDto
+    ): AttributeValueDto
+
 }

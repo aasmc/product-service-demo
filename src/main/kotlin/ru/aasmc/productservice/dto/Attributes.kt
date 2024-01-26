@@ -48,7 +48,7 @@ data class PlainAttributeDto(
     override val isFaceted: Boolean,
     override val type: AttributeType = AttributeType.PLAIN,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    override val isRequired: Boolean? = false,
+    override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
     val availableValues: List<AttributeValueDto>,
@@ -62,7 +62,7 @@ data class CompositeAttributeDto(
     override val isFaceted: Boolean,
     override val type: AttributeType = AttributeType.COMPOSITE,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    override val isRequired: Boolean? = false,
+    override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
     val availableValues: List<CompositeAttributeValueDto>

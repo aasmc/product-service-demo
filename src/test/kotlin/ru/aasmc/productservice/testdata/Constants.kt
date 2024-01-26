@@ -1,6 +1,7 @@
 package ru.aasmc.productservice.testdata
 
 const val BASE_CATEGORIES_URL = "/v1/categories"
+const val BASE_ATTRIBUTES_URL = "/v1/attributes"
 
 const val TEST_TOP_LEVEL_CATEGORY_NAME = "Test top level category"
 const val TEST_SUBCATEGORY_NAME = "Test subcategory name"
@@ -34,5 +35,4 @@ const val DIMENS_LENGTH_VALUE_30 = 30.0
 const val DIMENS_DEPTH_VALUE_10 = 10.0
 const val DIMENS_DEPTH_VALUE_20 = 20.0
 const val DIMENS_DEPTH_VALUE_30 = 30.0
-
 

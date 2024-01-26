@@ -10,7 +10,7 @@ abstract class AttributeValue(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "attribute_id", nullable = false)
     var attribute: Attribute,
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
@@ -73,7 +73,7 @@ class CompositeAttributeValue(
     @Column(nullable = false, unique = true)
     var name: String,
     @OneToMany(mappedBy = "compositeAttributeValue", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    var value: MutableSet<AttributeValue>,
+    var value: MutableSet<AttributeValue> = hashSetOf(),
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)
     var attribute: Attribute

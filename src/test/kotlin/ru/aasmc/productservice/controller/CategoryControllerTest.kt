@@ -8,6 +8,8 @@ import ru.aasmc.productservice.BaseIntegTest
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CompositeAttributeDto
 import ru.aasmc.productservice.dto.PlainAttributeDto
+import ru.aasmc.productservice.dto.SelectedAttribute
+import ru.aasmc.productservice.storage.repository.AttributeRepository
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.testdata.*
 import ru.aasmc.productservice.utils.CryptoTool
@@ -15,15 +17,15 @@ import java.time.LocalDateTime
 
 class CategoryControllerTest @Autowired constructor (
     private val cryptoTool: CryptoTool,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val attributeRepository: AttributeRepository
 ): BaseIntegTest() {
-
     @Test
     fun whenAddAttributeToCategory_addsAttributeToCategory() {
         var topLevel = topLevelCategoryDomain()
         topLevel = categoryRepository.save(topLevel)
         val topLevelIdStr = cryptoTool.hashOf(topLevel.id!!)
-        val dimensAttrDto = dimensionsAttributeDto()
+        val dimensAttrDto = dimensionsAttributeDto(true)
 
         webTestClient
             .put()
@@ -37,6 +39,7 @@ class CategoryControllerTest @Autowired constructor (
                 assertThat(response.attributes).hasSize(1)
                 val dimensAttr = response.attributes[0] as CompositeAttributeDto
                 assertThat(dimensAttr.availableValues).hasSize(3)
+                assertThat(dimensAttr.isRequired).isTrue()
                 val dimenValues = dimensAttr.availableValues
                     .sortedBy { it.name }
                 val depth = dimenValues[0]
@@ -48,6 +51,35 @@ class CategoryControllerTest @Autowired constructor (
                 assertThat(width.values).hasSize(3)
                 assertThat(length.name).isEqualTo(DIMENS_LENGTH_NAME)
                 assertThat(length.values).hasSize(3)
+            }
+    }
+
+    @Test
+    fun whenCreateCategoryWithSelectedAttributes_successfullyCreatesCategory() {
+        var sizeAttr = sizeAttributeDomain()
+        sizeAttr = attributeRepository.save(sizeAttr)
+        val sizeAttrIdStr = cryptoTool.hashOf(sizeAttr.id!!)
+
+        val request = topLevelCategoryRequestWithSelectedAttributes(
+            hashSetOf(
+                SelectedAttribute(sizeAttrIdStr, true)
+            )
+        )
+
+        webTestClient.post()
+            .uri(BASE_CATEGORIES_URL)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isCreated
+            .expectBody(CategoryResponse::class.java)
+            .value { response ->
+                assertThat(response.attributes).hasSize(1)
+                val size = response.attributes[0] as PlainAttributeDto
+                assertThat(size.id).isNotNull()
+                assertThat(size.attributeName).isEqualTo(CLOTHES_SIZE_ATTR_NAME)
+                assertThat(size.availableValues).hasSize(6)
+                assertThat(size.isRequired).isTrue()
             }
     }
 
@@ -80,8 +112,10 @@ class CategoryControllerTest @Autowired constructor (
                 val sizeAttr = sortedAttrs[1] as PlainAttributeDto
                 assertThat(dimensAttr.attributeName).isEqualTo(DIMENS_ATTR_NAME)
                 assertThat(dimensAttr.availableValues).hasSize(3)
+                assertThat(dimensAttr.isRequired).isTrue()
                 assertThat(sizeAttr.attributeName).isEqualTo(CLOTHES_SIZE_ATTR_NAME)
                 assertThat(sizeAttr.availableValues).hasSize(6)
+                assertThat(sizeAttr.isRequired).isTrue()
 
                 val dimenValues = dimensAttr.availableValues
                     .sortedBy { it.name }

@@ -29,18 +29,8 @@ class CategoryServiceImpl(
 
     override fun createCategory(dto: CreateCategoryRequest): CategoryResponse {
         val category = categoryRepository.save(mapper.toDomain(dto))
-        val newAttributes = dto.attributesToCreate
-            .map { attrDto ->
-                var attr = attributeMapper.toDomain(attrDto)
-                attr = attributeRepository.save(attr)
-                CategoryAttribute(
-                    isRequired = attrDto.isRequired ?: false,
-                    category = category,
-                    attribute = attr
-                )
-            }
-
-        category.categoryAttributes.addAll(newAttributes)
+        addNewAttributes(dto, category)
+        addSelectedAttributes(dto, category)
         log.debug("Successfully saved category to DB. {}", category)
         return mapper.toCategoryResponse(category)
     }
@@ -69,6 +59,42 @@ class CategoryServiceImpl(
         log.debug("Successfully added attribute to category")
         categoryRepository.save(category)
         return mapper.toCategoryResponse(category)
+    }
+
+    private fun addSelectedAttributes(
+        dto: CreateCategoryRequest,
+        category: Category
+    ) {
+        val attrToIsRequired = dto.selectedAttributeIds.map { attr ->
+            attributeRepository.findById(cryptoTool.idOf(attr.id))
+                .orElseThrow {
+                    val msg = "Attribute with id=$attr not found"
+                    ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
+                } to attr.isRequired
+        }
+
+        val categoryAttributes = attrToIsRequired.map { (attr, isRequired) ->
+            CategoryAttribute(isRequired, category, attr)
+        }
+        category.categoryAttributes.addAll(categoryAttributes)
+    }
+
+    private fun addNewAttributes(
+        dto: CreateCategoryRequest,
+        category: Category
+    ) {
+        val newAttributes = dto.attributesToCreate
+            .map { attrDto ->
+                var attr = attributeMapper.toDomain(attrDto)
+                attr = attributeRepository.save(attr)
+                CategoryAttribute(
+                    isRequired = attrDto.isRequired ?: false,
+                    category = category,
+                    attribute = attr
+                )
+            }
+
+        category.categoryAttributes.addAll(newAttributes)
     }
 
     private fun getCategoryOrThrow(id: String): Category = categoryRepository.findById(cryptoTool.idOf(id))

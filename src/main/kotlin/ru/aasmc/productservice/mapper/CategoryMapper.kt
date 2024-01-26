@@ -6,7 +6,8 @@ import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.storage.model.Category
-import ru.aasmc.productservice.storage.repository.CategoryAttributeRepository
+import ru.aasmc.productservice.storage.model.CategoryAttribute
+import ru.aasmc.productservice.storage.repository.AttributeRepository
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.utils.CryptoTool
 
@@ -14,7 +15,6 @@ import ru.aasmc.productservice.utils.CryptoTool
 class CategoryMapper(
     private val cryptoTool: CryptoTool,
     private val categoryRepository: CategoryRepository,
-    private val categoryAttributeRepository: CategoryAttributeRepository,
     private val attributeMapper: AttributeMapper
 ) {
 
@@ -27,18 +27,9 @@ class CategoryMapper(
                 ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
             }
 
-        val categoryAttributes = dto.selectedAttributeIds.map { attrId ->
-            categoryAttributeRepository.findById(cryptoTool.idOf(attrId))
-                .orElseThrow {
-                    val msg = "CategoryAttribute with id=$attrId not found"
-                    ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-                }
-        }.toHashSet()
-
         val newCategory = Category(
             name = dto.name,
             parent = parent,
-            categoryAttributes = categoryAttributes
         )
         parent?.subCategories?.add(newCategory)
         return newCategory
@@ -51,7 +42,7 @@ class CategoryMapper(
             parentId = domain.parent?.id?.let { cryptoTool.hashOf(it) },
             subcategoryNames = domain.subCategories.map { it.name },
             attributes = domain.categoryAttributes.map { categoryAttribute ->
-                attributeMapper.toDto(categoryAttribute.attribute)
+                attributeMapper.toDto(categoryAttribute.attribute, categoryAttribute.isRequired)
             },
             createdAt = domain.createdAt!!
         )

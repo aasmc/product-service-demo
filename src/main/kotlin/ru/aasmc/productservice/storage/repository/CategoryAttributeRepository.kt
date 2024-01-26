@@ -8,4 +8,6 @@ interface CategoryAttributeRepository: JpaRepository<CategoryAttribute, Long> {
 
     fun findByAttribute_Name(name: String): Optional<CategoryAttribute>
 
+    fun findByCategory_Name(name: String): List<CategoryAttribute>
+
 }

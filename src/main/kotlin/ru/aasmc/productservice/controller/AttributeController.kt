@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.AttributeValueDto
+import ru.aasmc.productservice.dto.AttributesCollection
 import ru.aasmc.productservice.dto.CompositeAttributeValueDto
 import ru.aasmc.productservice.service.AttributeService
 
@@ -24,15 +25,16 @@ class AttributeController(
     @GetMapping("/category/{categoryName}")
     fun getAttributesForCategory(
         @PathVariable("categoryName") categoryName: String
-    ): List<AttributeDto> {
+    ): AttributesCollection {
         log.info("Received request to GET all attributes for category with name={}", categoryName)
-        return attributeService.getAllAttributesForCategory(categoryName)
+        val attrs = attributeService.getAllAttributesForCategory(categoryName)
+        return AttributesCollection(attrs)
     }
 
     @GetMapping("/all")
-    fun getAllAttributes(): List<AttributeDto> {
+    fun getAllAttributes(): AttributesCollection {
         log.info("Received request to GET all attributes")
-        return attributeService.getAllAttributes()
+        return AttributesCollection(attributeService.getAllAttributes())
     }
 
     @GetMapping("/{name}")
@@ -57,6 +59,19 @@ class AttributeController(
     ): CompositeAttributeValueDto {
         log.info("Received PUT request to add composite value: {}, to attribute with ID={}", dto, attrId)
         return attributeService.addCompositeAttributeValue(attrId, dto)
+    }
+
+    @PutMapping("/compositeValue/{id}/value")
+    fun addValueToCompositeAttributeValue(
+        @PathVariable("id") compositeValueId: String,
+        @RequestBody dto: AttributeValueDto
+    ): AttributeValueDto {
+        log.info(
+            "Received PUT request to add attribute value: {} to a composite attribute value with ID={}",
+            dto,
+            compositeValueId
+        )
+        return attributeService.addValueToCompositeAttributeValue(compositeValueId, dto)
     }
 
     companion object {
