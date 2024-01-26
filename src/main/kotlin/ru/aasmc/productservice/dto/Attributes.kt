@@ -132,7 +132,7 @@ data class CompositeAttributeValueDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     val id: String? = null,
     val name: String,
-    val value: AttributeValueDto
+    val values: List<AttributeValueDto>
 )
 
 

@@ -13,7 +13,7 @@ abstract class AttributeValue(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)
     var attribute: Attribute,
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "composite_attribute_value_id")
     var compositeAttributeValue: CompositeAttributeValue? = null
 ) {
@@ -72,8 +72,8 @@ class CompositeAttributeValue(
     var id: Long? = null,
     @Column(nullable = false, unique = true)
     var name: String,
-    @OneToOne(mappedBy = "compositeAttributeValue", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    var value: AttributeValue,
+    @OneToMany(mappedBy = "compositeAttributeValue", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    var value: MutableSet<AttributeValue>,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attribute_id", nullable = false)
     var attribute: Attribute

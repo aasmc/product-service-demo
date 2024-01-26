@@ -38,78 +38,65 @@ fun dimensAttributeCompositeValues(): List<CompositeAttributeValueDto> =
     listOf(
         CompositeAttributeValueDto(
             name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_WIDTH_VALUE_10,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_WIDTH_VALUE_20,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_WIDTH_VALUE_30,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_LENGTH_VALUE_10,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_LENGTH_VALUE_20,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_LENGTH_VALUE_30,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_DEPTH_VALUE_10,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_DEPTH_VALUE_20,
-                numRuValue = null,
-                numUnit = "mm"
-            )
-        ),
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            value = NumericAttributeValueDto(
-                numValue = DIMENS_DEPTH_VALUE_30,
-                numRuValue = null,
-                numUnit = "mm"
+            values = listOf(
+                NumericAttributeValueDto(
+                    numValue = DIMENS_WIDTH_VALUE_10,
+                    numRuValue = null,
+                    numUnit = "mm"
+                ),
+                NumericAttributeValueDto(
+                    numValue = DIMENS_WIDTH_VALUE_20,
+                    numRuValue = null,
+                    numUnit = "mm"
+                ),
+                NumericAttributeValueDto(
+                    numValue = DIMENS_WIDTH_VALUE_30,
+                    numRuValue = null,
+                    numUnit = "mm"
+                )
             )
         ),
 
-
+        CompositeAttributeValueDto(
+            name = DIMENS_LENGTH_NAME,
+            values = listOf(
+                NumericAttributeValueDto(
+                    numValue = DIMENS_LENGTH_VALUE_10,
+                    numRuValue = null,
+                    numUnit = "mm"
+                ),
+                NumericAttributeValueDto(
+                    numValue = DIMENS_LENGTH_VALUE_20,
+                    numRuValue = null,
+                    numUnit = "mm"
+                ),
+                NumericAttributeValueDto(
+                    numValue = DIMENS_LENGTH_VALUE_30,
+                    numRuValue = null,
+                    numUnit = "mm"
+                )
+            )
+        ),
+        CompositeAttributeValueDto(
+            name = DIMENS_DEPTH_NAME,
+            values = listOf(
+                NumericAttributeValueDto(
+                    numValue = DIMENS_DEPTH_VALUE_10,
+                    numRuValue = null,
+                    numUnit = "mm"
+                ),
+                NumericAttributeValueDto(
+                    numValue = DIMENS_DEPTH_VALUE_20,
+                    numRuValue = null,
+                    numUnit = "mm"
+                ),
+                NumericAttributeValueDto(
+                    numValue = DIMENS_DEPTH_VALUE_30,
+                    numRuValue = null,
+                    numUnit = "mm"
+                )
+            )
+        )
     )
 
 fun sizeAttributeDto() = PlainAttributeDto(

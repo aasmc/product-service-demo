@@ -53,7 +53,7 @@ CREATE TABLE category_attributes(
 CREATE TABLE composite_attribute_value(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     attribute_id BIGINT NOT NULL REFERENCES attributes(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE INDEX composite_attribute_value_attribute_id_idx ON composite_attribute_value(attribute_id);

@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import ru.aasmc.productservice.BaseIntegTest
 import ru.aasmc.productservice.dto.CategoryResponse
+import ru.aasmc.productservice.dto.CompositeAttributeDto
+import ru.aasmc.productservice.dto.CompositeAttributeValueDto
+import ru.aasmc.productservice.dto.PlainAttributeDto
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.testdata.*
 import ru.aasmc.productservice.utils.CryptoTool
 import java.time.LocalDateTime
 
-class AttributeControllerTest @Autowired constructor (
+class CategoryControllerTest @Autowired constructor (
     private val cryptoTool: CryptoTool,
     private val categoryRepository: CategoryRepository
 ): BaseIntegTest() {
@@ -40,6 +43,25 @@ class AttributeControllerTest @Autowired constructor (
                 assertThat(response.createdAt).isNotNull()
                 assertThat(response.createdAt).isAfter(now)
                 assertThat(response.attributes).hasSize(2)
+                val sortedAttrs = response.attributes.sortedBy { it.attributeName }
+                val dimensAttr = sortedAttrs[0] as CompositeAttributeDto
+                val sizeAttr = sortedAttrs[1] as PlainAttributeDto
+                assertThat(dimensAttr.attributeName).isEqualTo(DIMENS_ATTR_NAME)
+                assertThat(dimensAttr.availableValues).hasSize(3)
+                assertThat(sizeAttr.attributeName).isEqualTo(CLOTHES_SIZE_ATTR_NAME)
+                assertThat(sizeAttr.availableValues).hasSize(6)
+
+                val dimenValues = dimensAttr.availableValues
+                    .sortedBy { it.name }
+                val depth = dimenValues[0]
+                val length = dimenValues[1]
+                val width = dimenValues[2]
+                assertThat(depth.name).isEqualTo(DIMENS_DEPTH_NAME)
+                assertThat(depth.values).hasSize(3)
+                assertThat(width.name).isEqualTo(DIMENS_WIDTH_NAME)
+                assertThat(width.values).hasSize(3)
+                assertThat(length.name).isEqualTo(DIMENS_LENGTH_NAME)
+                assertThat(length.values).hasSize(3)
             }
     }
 

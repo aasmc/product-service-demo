@@ -84,7 +84,7 @@ class AttributeValueMapper(
     ): CompositeAttributeValueDto = CompositeAttributeValueDto(
         id = cryptoTool.hashOf(compositeValue.id!!),
         name = compositeValue.name,
-        value = toDto(compositeValue.value)
+        values = toDtoList(compositeValue.value)
     )
 
     fun toCompositeDomain(
@@ -114,13 +114,13 @@ class AttributeValueMapper(
     ): CompositeAttributeValue {
         return compositeAttributeValueRepository.findByName(dto.name)
             .orElseGet {
-                val value = toDomain(dto.value, attribute)
+                val values = toDomainList(dto.values, attribute)
                 val composite = CompositeAttributeValue(
                     name = dto.name,
                     attribute = attribute,
-                    value = value
+                    value = values
                 )
-                value.compositeAttributeValue = composite
+                values.forEach { it.compositeAttributeValue = composite }
                 composite
             }
     }
