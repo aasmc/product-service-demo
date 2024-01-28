@@ -15,7 +15,7 @@ data class ProductVariantRequestDto(
     val variantName: String,
     val price: BigDecimal,
     val stock: Int,
-    val attributes: List<AttributeDto>,
+    val attributeCollection: AttributeCollection,
     val images: ImageCollection
 )
 
@@ -35,7 +35,7 @@ data class ProductVariantResponse(
     val variantName: String,
     val price: BigDecimal,
     val stock: Int,
-    val attributes: List<AttributeDto>,
+    val attributesCollection: AttributeCollection,
     val images: ImageCollection,
     val createdAt: LocalDateTime
 )

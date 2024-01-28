@@ -6,8 +6,6 @@ import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.storage.model.Category
-import ru.aasmc.productservice.storage.model.CategoryAttribute
-import ru.aasmc.productservice.storage.repository.AttributeRepository
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.utils.CryptoTool
 
@@ -15,7 +13,7 @@ import ru.aasmc.productservice.utils.CryptoTool
 class CategoryMapper(
     private val cryptoTool: CryptoTool,
     private val categoryRepository: CategoryRepository,
-    private val attributeMapper: AttributeMapper
+    private val attributeMapper: AttributeMappers
 ) {
 
     fun toDomain(dto: CreateCategoryRequest): Category {

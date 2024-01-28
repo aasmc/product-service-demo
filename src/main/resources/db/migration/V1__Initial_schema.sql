@@ -33,15 +33,23 @@ CREATE INDEX categories_updated_at_idx ON categories(updated_at);
 
 CREATE TABLE attributes(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    composite_attribute_id BIGINT REFERENCES attributes(id),
     name VARCHAR(255) NOT NULL UNIQUE,
     short_name VARCHAR(255) NOT NULL,
     is_faceted BOOLEAN NOT NULL DEFAULT true,
     is_composite BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    updated_at TIMESTAMP NOT NULL,
+    numeric_values JSONB,
+    string_values JSONB,
+    color_values JSONB,
+    a_type VARCHAR(8)
 );
 
 CREATE INDEX attributes_updated_at_idx ON attributes(updated_at);
+CREATE INDEX attributes_numeric_values_idx ON attributes using GIN(numeric_values);
+CREATE INDEX attributes_string_values_idx ON attributes using GIN(string_values);
+CREATE INDEX attributes_color_values_idx ON attributes using GIN(color_values);
 
 CREATE TABLE category_attributes(
     category_id BIGINT REFERENCES categories(id) NOT NULL,
@@ -49,32 +57,6 @@ CREATE TABLE category_attributes(
     is_required BOOLEAN NOT NULL DEFAULT false,
     PRIMARY KEY(category_id, attribute_id)
 );
-
-CREATE TABLE composite_attribute_value(
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    attribute_id BIGINT NOT NULL REFERENCES attributes(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL UNIQUE
-);
-
-CREATE INDEX composite_attribute_value_attribute_id_idx ON composite_attribute_value(attribute_id);
-
-CREATE TABLE attribute_values(
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    av_type VARCHAR(10) NOT NULL,
-    attribute_id BIGINT NOT NULL REFERENCES attributes(id) ON DELETE CASCADE,
-    composite_attribute_value_id BIGINT REFERENCES composite_attribute_value(id),
-    string_value TEXT UNIQUE,
-    string_ru_value TEXT,
-    num_value DOUBLE PRECISION,
-    num_ru_value DOUBLE PRECISION,
-    num_unit VARCHAR(50),
-    color_value VARCHAR(50),
-    color_hex_code VARCHAR(12)
-);
-
-CREATE INDEX attribute_values_attribute_id_idx ON attribute_values(attribute_id);
-CREATE UNIQUE INDEX attribute_values_num_value_num_ru_value_num_unit_idx ON attribute_values(num_value, num_ru_value, num_unit);
-
 
 CREATE TABLE products(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

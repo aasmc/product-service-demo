@@ -10,8 +10,10 @@ enum class AttributeType(
     @field:JsonValue
     val value: String
 ) {
-    PLAIN("plain"),
-    COMPOSITE("composite")
+    STRING_ATTR("string"),
+    NUMERIC_ATTR("numeric"),
+    COLOR_ATTR("color"),
+    COMPOSITE_ATTR("composite")
 }
 
 @JsonTypeInfo(
@@ -22,8 +24,16 @@ enum class AttributeType(
 )
 @JsonSubTypes(*arrayOf(
     JsonSubTypes.Type(
-        value = PlainAttributeDto::class,
-        name = "plain"
+        value = StringAttributeDto::class,
+        name = "string"
+    ),
+    JsonSubTypes.Type(
+        value = NumericAttributeDto::class,
+        name = "numeric"
+    ),
+    JsonSubTypes.Type(
+        value = ColorAttributeDto::class,
+        name = "color"
     ),
     JsonSubTypes.Type(
         value = CompositeAttributeDto::class,
@@ -40,18 +50,46 @@ sealed class AttributeDto(
     open val isRequired: Boolean? = null
 )
 
-data class PlainAttributeDto(
+data class StringAttributeDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val id: String? = null,
     override val attributeName: String,
     override val shortName: String,
     override val isFaceted: Boolean,
-    override val type: AttributeType = AttributeType.PLAIN,
+    override val type: AttributeType = AttributeType.STRING_ATTR,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val availableValues: List<AttributeValueDto>,
+    val availableValues: List<StringAttributeValueDto>,
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+
+data class NumericAttributeDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
+    override val attributeName: String,
+    override val shortName: String,
+    override val isFaceted: Boolean,
+    override val type: AttributeType = AttributeType.NUMERIC_ATTR,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val isRequired: Boolean? = null,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val createdAt: LocalDateTime? = null,
+    val availableValues: List<NumericAttributeValueDto>,
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+
+data class ColorAttributeDto(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val id: String? = null,
+    override val attributeName: String,
+    override val shortName: String,
+    override val isFaceted: Boolean,
+    override val type: AttributeType = AttributeType.COLOR_ATTR,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val isRequired: Boolean? = null,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    override val createdAt: LocalDateTime? = null,
+    val availableValues: List<ColorAttributeValueDto>,
 ) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
 
 data class CompositeAttributeDto(
@@ -60,13 +98,13 @@ data class CompositeAttributeDto(
     override val attributeName: String,
     override val shortName: String,
     override val isFaceted: Boolean,
-    override val type: AttributeType = AttributeType.COMPOSITE,
+    override val type: AttributeType = AttributeType.COMPOSITE_ATTR,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val availableValues: List<CompositeAttributeValueDto>
-) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+    val subAttributes: List<AttributeDto>
+): AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
 
 enum class AttributeValueType(
     @field:JsonValue
@@ -100,41 +138,26 @@ enum class AttributeValueType(
     )
 )
 sealed class AttributeValueDto(
-    @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    open val id: String?,
     open val type: AttributeValueType
 )
 
 data class StringAttributeValueDto(
-    @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    override val id: String? = null,
     val stringValue: String,
     val stringRuValue: String?,
     override val type: AttributeValueType = AttributeValueType.STRING_TYPE
-) : AttributeValueDto(id, type)
+) : AttributeValueDto(type)
 
 data class NumericAttributeValueDto(
-    @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    override val id: String? = null,
     val numValue: Double,
     val numRuValue: Double?,
     val numUnit: String,
     override val type: AttributeValueType = AttributeValueType.NUMERIC_TYPE
-) : AttributeValueDto(id, type)
+) : AttributeValueDto(type)
 
 data class ColorAttributeValueDto(
-    @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    override val id: String? = null,
     val colorValue: String,
     val colorHex: String,
     override val type: AttributeValueType = AttributeValueType.COLOR_TYPE
-) : AttributeValueDto(id, type)
-
-data class CompositeAttributeValueDto(
-    @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    val id: String? = null,
-    val name: String,
-    val values: List<AttributeValueDto>
-)
+) : AttributeValueDto(type)
 
 

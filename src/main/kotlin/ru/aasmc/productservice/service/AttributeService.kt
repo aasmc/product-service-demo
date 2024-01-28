@@ -2,7 +2,6 @@ package ru.aasmc.productservice.service
 
 import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.AttributeValueDto
-import ru.aasmc.productservice.dto.CompositeAttributeValueDto
 
 interface AttributeService {
 
@@ -17,16 +16,6 @@ interface AttributeService {
     fun addAttributeValue(
         attributeId: String,
         dto: AttributeValueDto,
-    ): AttributeValueDto
-
-    fun addCompositeAttributeValue(
-        attributeId: String,
-        dto: CompositeAttributeValueDto,
-    ): CompositeAttributeValueDto
-
-    fun addValueToCompositeAttributeValue(
-        compositeValueId: String,
-        dto: AttributeValueDto
     ): AttributeValueDto
 
 }

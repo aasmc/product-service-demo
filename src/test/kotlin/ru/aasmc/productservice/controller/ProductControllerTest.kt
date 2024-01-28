@@ -43,55 +43,52 @@ class ProductControllerTest : BaseIntegTest() {
             .responseBody!!
 
         val sizeAttr = categoryResponse.attributes
-            .first { it.attributeName == CLOTHES_SIZE_ATTR_NAME }
+            .first { it.attributeName == CLOTHES_SIZE_ATTR_NAME } as StringAttributeDto
 
         val colorAttr = categoryResponse.attributes
-            .first { it.attributeName == COLOR_ATTR_NAME }
+            .first { it.attributeName == COLOR_ATTR_NAME } as ColorAttributeDto
 
-        val blue = (colorAttr as PlainAttributeDto).availableValues
-            .first { (it as ColorAttributeValueDto).colorValue == BLUE }
+        val blue = colorAttr.availableValues
+            .first { it.colorValue == BLUE }
 
-        val red = (colorAttr as PlainAttributeDto).availableValues
-            .first { (it as ColorAttributeValueDto).colorValue == RED }
+        val red = colorAttr.availableValues
+            .first { it.colorValue == RED }
 
-        val green = (colorAttr as PlainAttributeDto).availableValues
-            .first { (it as ColorAttributeValueDto).colorValue == GREEN }
+        val green = colorAttr.availableValues
+            .first { it.colorValue == GREEN }
 
-        val blueSizes = (sizeAttr as PlainAttributeDto).availableValues
-            .filter {
-                val value = (it as StringAttributeValueDto)
+        val blueSizes = sizeAttr.availableValues
+            .filter { value ->
                 value.stringValue == SIZE_XS_VALUE ||
                         value.stringValue == SIZE_S_VALUE ||
                         value.stringValue == SIZE_M_VALUE
             }
 
-        val redSizes = (sizeAttr as PlainAttributeDto).availableValues
-            .filter {
-                val value = (it as StringAttributeValueDto)
+        val redSizes = sizeAttr.availableValues
+            .filter { value ->
                 value.stringValue == SIZE_M_VALUE ||
                         value.stringValue == SIZE_L_VALUE ||
                         value.stringValue == SIZE_XL_VALUE
             }
 
-        val greenSizes = (sizeAttr as PlainAttributeDto).availableValues
-            .filter {
-                val value = (it as StringAttributeValueDto)
+        val greenSizes = sizeAttr.availableValues
+            .filter {value ->
                 value.stringValue == SIZE_S_VALUE ||
                         value.stringValue == SIZE_M_VALUE ||
                         value.stringValue == SIZE_L_VALUE
             }
 
-        val blueAttributes = listOf(
+        val blueAttributes = mutableListOf(
             sizeAttr.copy(availableValues = blueSizes),
             colorAttr.copy(availableValues = listOf(blue))
         )
 
-        val redAttributes = listOf(
+        val redAttributes = mutableListOf(
             sizeAttr.copy(availableValues = redSizes),
             colorAttr.copy(availableValues = listOf(red))
         )
 
-        val greenAttributes = listOf(
+        val greenAttributes = mutableListOf(
             sizeAttr.copy(availableValues = greenSizes),
             colorAttr.copy(availableValues = listOf(green))
         )
@@ -128,9 +125,9 @@ class ProductControllerTest : BaseIntegTest() {
                 val greenVariant = response.variants
                     .first { it.variantName == T_SHIRT_GREEN_VARIANT_NAME }
 
-                assertThat(redVariant.attributes).hasSize(2)
-                assertThat(blueVariant.attributes).hasSize(2)
-                assertThat(greenVariant.attributes).hasSize(2)
+                assertThat(redVariant.attributesCollection.attributes).hasSize(2)
+                assertThat(blueVariant.attributesCollection.attributes).hasSize(2)
+                assertThat(greenVariant.attributesCollection.attributes).hasSize(2)
             }
 
     }

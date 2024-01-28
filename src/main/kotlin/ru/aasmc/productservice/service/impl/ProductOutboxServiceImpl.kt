@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ru.aasmc.productservice.service.ProductOutboxService
 import ru.aasmc.productservice.storage.model.*
-import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.storage.repository.ProductOutboxRepository
 
 @Service

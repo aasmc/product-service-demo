@@ -45,7 +45,7 @@ class ProductMapper(
                 variantName = variant.variantName,
                 price = variant.price,
                 stock = variant.stock,
-                attributes = variant.attributes,
+                attributesCollection = variant.attributes,
                 images = variant.images,
                 createdAt = variant.createdAt!!
             )

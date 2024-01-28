@@ -1,5 +1,6 @@
 package ru.aasmc.productservice.storage.model
 
+import ru.aasmc.productservice.dto.AttributeCollection
 import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.ImageCollection
 import java.math.BigDecimal
@@ -22,7 +23,7 @@ data class ProductEventVariant(
     val variantId: Long,
     val price: BigDecimal,
     val stock: Int,
-    val attributes: List<AttributeDto>,
+    val attributes: AttributeCollection,
     val images: ImageCollection,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
