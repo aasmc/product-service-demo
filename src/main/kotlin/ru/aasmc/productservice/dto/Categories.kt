@@ -1,17 +1,24 @@
 package ru.aasmc.productservice.dto
 
+import java.time.LocalDateTime
+
 data class CreateCategoryRequest(
     val name: String,
-    val attributeNames: Set<String>,
+    val selectedAttributeIds: Set<SelectedAttribute> = hashSetOf(),
+    val attributesToCreate: List<AttributeDto> = listOf(),
     val parentId: String? = null,
 )
 
-data class CreateCategoryResponse(
-    val categoryId: String
+data class SelectedAttribute(
+    val id: String,
+    val isRequired: Boolean
 )
 
 data class CategoryResponse(
     val categoryId: String,
-    val parentCategoryId: String?,
-    val attributeNames: List<String>
+    val name: String,
+    val parentId: String?,
+    val subcategoryNames: List<String>,
+    val createdAt: LocalDateTime,
+    val attributes: List<AttributeDto>
 )

@@ -26,11 +26,13 @@ class ProductServiceImpl(
     private val productOutboxService: ProductOutboxService
 ): ProductService {
 
-    override fun createProduct(dto: CreateProductRequest): CreateProductResponse {
+    override fun createProduct(dto: CreateProductRequest): ProductResponse {
+        // TODO discuss whether we need to check if all required attributes of
+        // category have been filled, or is a check-up on front enough?
         val product = productRepository.save(mapper.toDomain(dto))
         log.debug("Successfully saved product: {}", product)
         productOutboxService.addEvent(product.id!!, product, EventType.INSERT)
-        return mapper.toCreateDto(product)
+        return mapper.toProductResponseDto(product)
     }
 
     override fun getProductById(id: String): ProductResponse {
@@ -43,7 +45,7 @@ class ProductServiceImpl(
         return mapper.toProductResponseDto(product)
     }
 
-    override fun getProductVariants(id: String): List<ProductVariantFullResponseDto> {
+    override fun getProductVariants(id: String): List<ProductVariantResponse> {
         val product = productRepository.findById(cryptoTool.idOf(id))
             .orElseThrow {
                 val msg = "Product with ID=$id not found"
@@ -53,7 +55,7 @@ class ProductServiceImpl(
         return product.variants.map(productVariantMapper::toProductVariantFullResponse)
     }
 
-    override fun addProductVariant(productId: String, dto: ProductVariantRequestDto): ProductVariantFullResponseDto {
+    override fun addProductVariant(productId: String, dto: ProductVariantRequestDto): ProductVariantResponse {
         val product = productRepository.findById(cryptoTool.idOf(productId))
             .orElseThrow {
                 val msg = "Product with ID=$productId not found"

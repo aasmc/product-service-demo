@@ -6,13 +6,16 @@ data class CreateSellerRequest(
 )
 
 data class CreateSellerResponse(
-    val id: String
+    val id: String,
+    val firstName: String,
+    val lastName: String
 )
 
 data class SellerResponse(
     val id: String,
     val firstName: String,
-    val lastName: String
+    val lastName: String,
+    val shops: List<ShopResponse>
 )
 
 

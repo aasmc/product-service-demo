@@ -3,9 +3,7 @@ package ru.aasmc.productservice.mapper
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import ru.aasmc.productservice.dto.CreateShopRequest
-import ru.aasmc.productservice.dto.CreateShopResponse
-import ru.aasmc.productservice.dto.ShopFullResponse
-import ru.aasmc.productservice.dto.ShopShortResponse
+import ru.aasmc.productservice.dto.ShopResponse
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.storage.model.Seller
 import ru.aasmc.productservice.storage.model.Shop
@@ -28,21 +26,10 @@ class ShopMapper(
         )
     }
 
-    fun toCreateDto(domain: Shop): CreateShopResponse =
-        CreateShopResponse(cryptoTool.hashOf(domain.id!!))
-
-    fun toShortResponse(domain: Shop): ShopShortResponse =
-        ShopShortResponse(
-            id = cryptoTool.hashOf(domain.id!!),
-            sellerId = cryptoTool.hashOf(domain.seller.id!!),
-            name = domain.name,
-            description = domain.name
-        )
-
-    fun toFullResponse(domain: Shop): ShopFullResponse {
+    fun toFullResponse(domain: Shop): ShopResponse {
         val products = domain.products
             .map(productMapper::toProductResponseDto)
-        return ShopFullResponse(
+        return ShopResponse(
             id = cryptoTool.hashOf(domain.id!!),
             sellerId = cryptoTool.hashOf(domain.seller.id!!),
             name = domain.name,

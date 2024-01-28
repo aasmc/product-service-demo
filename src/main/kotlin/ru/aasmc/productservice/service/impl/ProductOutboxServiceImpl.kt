@@ -29,7 +29,9 @@ class ProductOutboxServiceImpl(
             categoryString = buildCategoryString(product.category),
             productName = product.name,
             productDescription = product.description,
-            variants = mapVariants(product.variants)
+            variants = mapVariants(product.variants),
+            createdAt = product.createdAt!!,
+            updatedAt = product.updatedAt!!
         )
     }
 
@@ -40,7 +42,9 @@ class ProductOutboxServiceImpl(
                 price = variant.price,
                 stock = variant.stock,
                 attributes = variant.attributes,
-                images = variant.images
+                images = variant.images,
+                createdAt = variant.createdAt!!,
+                updatedAt = variant.updatedAt!!
             )
         }
     }

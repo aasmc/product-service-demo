@@ -2,174 +2,138 @@ package ru.aasmc.productservice.controller
 
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import ru.aasmc.productservice.BaseIntegTest
 import ru.aasmc.productservice.dto.*
-import ru.aasmc.productservice.storage.model.*
-import ru.aasmc.productservice.storage.repository.*
-import ru.aasmc.productservice.utils.CryptoTool
-import java.math.BigDecimal
+import ru.aasmc.productservice.testdata.*
+import java.time.LocalDateTime
 
-class ProductControllerTest @Autowired constructor (
-    private val shopRepository: ShopRepository,
-    private val sellerRepository: SellerRepository,
-    private val categoryRepository: CategoryRepository,
-    private val attributeRepository: AttributeRepository,
-    private val attributeValueRepository: AttributeValueRepository,
-    private val attributeValueComponentRepository: AttributeValueComponentRepository,
-    private val productOutboxRepository: ProductOutboxRepository,
-    private val categoryAttributeRepository: CategoryAttributeRepository,
-    private val cryptoTool: CryptoTool
-): BaseIntegTest() {
+class ProductControllerTest : BaseIntegTest() {
 
     @Test
-    fun testCreateProduct() {
-        val seller = addSeller()
-        val shop = addShop(seller)
-        val dimensions = addDimensionsAttribute()
-        val parentCategory = addTopLevelCategory()
-        val subCategory = addSubCategory(parentCategory, dimensions)
+    fun createProduct_integTest() {
+        val sellerRequest = createSellerRequest()
+        val sellerResponse = webTestClient.post()
+            .uri(BASE_SELLERS_URL)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(sellerRequest)
+            .exchange()
+            .expectBody(CreateSellerResponse::class.java)
+            .returnResult()
+            .responseBody!!
 
-        val productDto = CreateProductRequest(
-            shopId = cryptoTool.hashOf(shop.id!!),
-            categoryName = subCategory.name,
-            name = "Kettle",
-            description = "Kitchen Kettle",
-            variants = setOf(
-                ProductVariantRequestDto(
-                    variantName = "Blue Kettle",
-                    price = BigDecimal.TEN,
-                    stock = 10,
-                    attributes = mutableMapOf(
-                        "DimensionsAttribute" to mapOf(
-                            "width" to "10",
-                            "height" to "10",
-                            "depth" to "10"
-                        )
-                    ),
-                    images = ImageCollection(
-                        images = mutableListOf(
-                            AppImage(
-                                "http://aasmc.ru/blue_kettle.png",
-                                isPrimary = true
-                            )
-                        )
-                    )
-                )
-            )
+        val shopRequest = createShopRequest(sellerResponse.id)
+        val shopResponse = webTestClient.post()
+            .uri(BASE_SHOPS_URL)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(shopRequest)
+            .exchange()
+            .expectBody(ShopResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        val categoryRequest = topLevelCategoryWithAttributes()
+        val categoryResponse = webTestClient.post()
+            .uri(BASE_CATEGORIES_URL)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(categoryRequest)
+            .exchange()
+            .expectBody(CategoryResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        val sizeAttr = categoryResponse.attributes
+            .first { it.attributeName == CLOTHES_SIZE_ATTR_NAME }
+
+        val colorAttr = categoryResponse.attributes
+            .first { it.attributeName == COLOR_ATTR_NAME }
+
+        val blue = (colorAttr as PlainAttributeDto).availableValues
+            .first { (it as ColorAttributeValueDto).colorValue == BLUE }
+
+        val red = (colorAttr as PlainAttributeDto).availableValues
+            .first { (it as ColorAttributeValueDto).colorValue == RED }
+
+        val green = (colorAttr as PlainAttributeDto).availableValues
+            .first { (it as ColorAttributeValueDto).colorValue == GREEN }
+
+        val blueSizes = (sizeAttr as PlainAttributeDto).availableValues
+            .filter {
+                val value = (it as StringAttributeValueDto)
+                value.stringValue == SIZE_XS_VALUE ||
+                        value.stringValue == SIZE_S_VALUE ||
+                        value.stringValue == SIZE_M_VALUE
+            }
+
+        val redSizes = (sizeAttr as PlainAttributeDto).availableValues
+            .filter {
+                val value = (it as StringAttributeValueDto)
+                value.stringValue == SIZE_M_VALUE ||
+                        value.stringValue == SIZE_L_VALUE ||
+                        value.stringValue == SIZE_XL_VALUE
+            }
+
+        val greenSizes = (sizeAttr as PlainAttributeDto).availableValues
+            .filter {
+                val value = (it as StringAttributeValueDto)
+                value.stringValue == SIZE_S_VALUE ||
+                        value.stringValue == SIZE_M_VALUE ||
+                        value.stringValue == SIZE_L_VALUE
+            }
+
+        val blueAttributes = listOf(
+            sizeAttr.copy(availableValues = blueSizes),
+            colorAttr.copy(availableValues = listOf(blue))
         )
 
-        webTestClient.post()
-            .uri("/v1/products")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(productDto)
+        val redAttributes = listOf(
+            sizeAttr.copy(availableValues = redSizes),
+            colorAttr.copy(availableValues = listOf(red))
+        )
+
+        val greenAttributes = listOf(
+            sizeAttr.copy(availableValues = greenSizes),
+            colorAttr.copy(availableValues = listOf(green))
+        )
+
+        val tShirtRequest = createTshirtRequest(
+            shopResponse.id,
+            blueAttributes,
+            redAttributes,
+            greenAttributes
+        )
+
+        val now = LocalDateTime.now()
+
+        webTestClient
+            .post()
+            .uri(BASE_PRODUCTS_URL)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue(tShirtRequest)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(CreateProductResponse::class.java)
+            .expectBody(ProductResponse::class.java)
             .value { response ->
-                println(response)
                 assertThat(response.productId).isNotNull()
-                assertThat(response.variants).hasSize(1)
-                assertThat(response.variants[0].variantName).isEqualTo("Blue Kettle")
+                assertThat(response.shopId).isEqualTo(shopResponse.id)
+                assertThat(response.categoryName).isEqualTo(categoryResponse.name)
+                assertThat(response.name).isEqualTo(tShirtRequest.name)
+                assertThat(response.description).isEqualTo(tShirtRequest.description)
+                assertThat(response.createdAt).isAfter(now)
+                assertThat(response.variants).hasSize(3)
+                val blueVariant = response.variants
+                    .first { it.variantName == T_SHIRT_BLUE_VARIANT_NAME }
+                val redVariant = response.variants
+                    .first { it.variantName == T_SHIRT_RED_VARIANT_NAME }
+                val greenVariant = response.variants
+                    .first { it.variantName == T_SHIRT_GREEN_VARIANT_NAME }
+
+                assertThat(redVariant.attributes).hasSize(2)
+                assertThat(blueVariant.attributes).hasSize(2)
+                assertThat(greenVariant.attributes).hasSize(2)
             }
-    }
-
-    @Test
-    fun contextLoads() {
 
     }
 
-    private fun addTopLevelCategory(): Category {
-        val category = Category(
-            name = "House"
-        )
-        return categoryRepository.save(category)
-    }
-
-    private fun addSubCategory(parent: Category, attribute: Attribute): Category {
-        val category = Category(
-            name = "Kitchen",
-            parent = parent
-        )
-        categoryRepository.save(category)
-        val categoryAttribute = CategoryAttribute(
-            isRequired = true,
-            category = category,
-            attribute = attribute
-        )
-        category.categoryAttributes.add(categoryAttribute)
-        return categoryRepository.save(category)
-    }
-
-    private fun addDimensionsAttribute(): Attribute {
-        val attribute = Attribute(
-            name = "DimensionsAttribute"
-        )
-        val attributeValue = AttributeValue(
-            attribute = attribute,
-            value = "dimensions",
-            isComposite = true
-        )
-        attribute.attributeValues.add(attributeValue)
-
-        val width10Component = AttributeValueComponent(
-            attributeValue = attributeValue,
-            componentName = "width",
-            componentValue = "10"
-        )
-        val width20Component = AttributeValueComponent(
-            attributeValue = attributeValue,
-            componentName = "width",
-            componentValue = "20"
-        )
-
-        val height10Component = AttributeValueComponent(
-            attributeValue = attributeValue,
-            componentName = "height",
-            componentValue = "10"
-        )
-        val height20Component = AttributeValueComponent(
-            attributeValue = attributeValue,
-            componentName = "height",
-            componentValue = "20"
-        )
-
-        val depth10Component = AttributeValueComponent(
-            attributeValue = attributeValue,
-            componentName = "depth",
-            componentValue = "10"
-        )
-        val depth20Component = AttributeValueComponent(
-            attributeValue = attributeValue,
-            componentName = "depth",
-            componentValue = "20"
-        )
-        attributeValue.components.add(width10Component)
-        attributeValue.components.add(width20Component)
-        attributeValue.components.add(height10Component)
-        attributeValue.components.add(height20Component)
-        attributeValue.components.add(depth10Component)
-        attributeValue.components.add(depth20Component)
-        return attributeRepository.save(attribute)
-    }
-
-
-    private fun addSeller(): Seller {
-        val seller = Seller(
-            firstName = "SellerFirstName",
-            lastName = "SellerLastName"
-        )
-        return sellerRepository.save(seller)
-    }
-
-    private fun addShop(seller: Seller): Shop {
-        val shop = Shop(
-            seller = seller,
-            name = "Test Shop",
-            description = "Test Shop Description"
-        )
-        return shopRepository.save(shop)
-    }
 
 }

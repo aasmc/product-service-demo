@@ -1,10 +1,11 @@
 package ru.aasmc.productservice.storage.model
 
 import jakarta.persistence.*
-import org.hibernate.annotations.BatchSize
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "shops")
+@org.hibernate.annotations.BatchSize(size = 10)
 class Shop(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,9 +16,17 @@ class Shop(
     var name: String,
     var description: String,
     @OneToMany(mappedBy = "shop")
-    @BatchSize(size = 10)
-    val products: MutableSet<Product> = hashSetOf()
+    @org.hibernate.annotations.BatchSize(size = 10)
+    val products: MutableSet<Product> = hashSetOf(),
+
 ) {
+
+    @Column(name = "created_at")
+    @org.hibernate.annotations.CreationTimestamp
+    var createdAt: LocalDateTime? = null
+    @Column(name = "updated_at")
+    @org.hibernate.annotations.UpdateTimestamp
+    var updatedAt: LocalDateTime? = null
 
     override fun toString(): String {
         return "Shop(id=$id, name='$name', description='$description')"

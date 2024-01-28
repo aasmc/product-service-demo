@@ -1,16 +1,32 @@
 package ru.aasmc.productservice.service
 
-import ru.aasmc.productservice.dto.AttributeResponse
-import ru.aasmc.productservice.dto.CreateAttributeRequest
+import ru.aasmc.productservice.dto.AttributeDto
+import ru.aasmc.productservice.dto.AttributeValueDto
+import ru.aasmc.productservice.dto.CompositeAttributeValueDto
 
 interface AttributeService {
 
-    fun createAttribute(dto: CreateAttributeRequest): AttributeResponse
+    fun createAttribute(dto: AttributeDto): AttributeDto
 
-    fun getAllAttributesForCategory(categoryName: String): List<AttributeResponse>
+    fun getAllAttributesForCategory(categoryName: String): List<AttributeDto>
 
-    fun getAllAttributes(): List<AttributeResponse>
+    fun getAllAttributes(): List<AttributeDto>
 
-    fun getAttributeByName(name: String): AttributeResponse
+    fun getAttributeByName(name: String): AttributeDto
+
+    fun addAttributeValue(
+        attributeId: String,
+        dto: AttributeValueDto,
+    ): AttributeValueDto
+
+    fun addCompositeAttributeValue(
+        attributeId: String,
+        dto: CompositeAttributeValueDto,
+    ): CompositeAttributeValueDto
+
+    fun addValueToCompositeAttributeValue(
+        compositeValueId: String,
+        dto: AttributeValueDto
+    ): AttributeValueDto
 
 }
