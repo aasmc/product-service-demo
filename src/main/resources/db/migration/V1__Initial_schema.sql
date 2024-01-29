@@ -77,8 +77,8 @@ CREATE TABLE product_variants (
     product_id BIGINT REFERENCES products(id) ON DELETE CASCADE,
     attributes JSONB,
     images JSONB,
+    skus JSONB,
     price DECIMAL NOT NULL,
-    stock INT DEFAULT 0,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
@@ -86,6 +86,7 @@ CREATE TABLE product_variants (
 CREATE INDEX product_variants_product_id_idx ON product_variants(product_id);
 CREATE INDEX product_variants_attributes_idx ON product_variants using GIN(attributes);
 CREATE INDEX product_variants_images_idx ON product_variants using GIN(images);
+CREATE INDEX product_variants_skus_idx ON product_variants using GIN(skus);
 
 CREATE TABLE product_outbox (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

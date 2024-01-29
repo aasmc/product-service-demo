@@ -39,11 +39,11 @@ class ProductOutboxServiceImpl(
             ProductEventVariant(
                 variantId = variant.id!!,
                 price = variant.price,
-                stock = variant.stock,
                 attributes = variant.attributes,
                 images = variant.images,
                 createdAt = variant.createdAt!!,
-                updatedAt = variant.updatedAt!!
+                updatedAt = variant.updatedAt!!,
+                skuCollection = variant.skuCollection
             )
         }
     }

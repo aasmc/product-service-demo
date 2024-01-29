@@ -5,6 +5,7 @@ import jakarta.persistence.*
 import ru.aasmc.productservice.dto.AttributeCollection
 import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.ImageCollection
+import ru.aasmc.productservice.dto.SkuCollection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -18,13 +19,15 @@ class ProductVariant(
     var variantName: String,
     @Column(nullable = false)
     var price: BigDecimal,
-    var stock: Int,
     @org.hibernate.annotations.Type(JsonBinaryType::class)
     @Column(columnDefinition = "jsonb", name = "attributes")
     var attributes: AttributeCollection = AttributeCollection(),
     @org.hibernate.annotations.Type(JsonBinaryType::class)
     @Column(columnDefinition = "jsonb", name = "images")
     var images: ImageCollection = ImageCollection(),
+    @org.hibernate.annotations.Type(JsonBinaryType::class)
+    @Column(columnDefinition = "jsonb", name = "skus")
+    var skuCollection: SkuCollection,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
@@ -39,7 +42,7 @@ class ProductVariant(
     var updatedAt: LocalDateTime? = null
 
     override fun toString(): String {
-        return "ProductVariant(id=$id, price=$price, stock=$stock, attributes=$attributes, images=$images)"
+        return "ProductVariant(id=$id, price=$price, attributes=$attributes, images=$images, skuCollection=$skuCollection)"
     }
 
     override fun equals(other: Any?): Boolean {

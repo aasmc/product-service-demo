@@ -26,10 +26,10 @@ class ProductVariantMapper(
         return ProductVariant(
             variantName = dto.variantName,
             price = dto.price,
-            stock = dto.stock,
             attributes = dto.attributeCollection,
             images = dto.images,
-            product = product
+            product = product,
+            skuCollection = dto.skuCollection
         )
     }
 
@@ -39,10 +39,10 @@ class ProductVariantMapper(
             variantId = cryptoTool.hashOf(domain.id!!),
             variantName = domain.variantName,
             price = domain.price,
-            stock = domain.stock,
             attributesCollection = domain.attributes,
             images = domain.images,
-            createdAt = domain.createdAt!!
+            createdAt = domain.createdAt!!,
+            skuCollection = domain.skuCollection
         )
 
 

@@ -307,14 +307,24 @@ fun shopDomain(seller: Seller) = Shop(
 fun createTshirtRequest(
     shopId: String,
     blueAttributes: MutableList<AttributeDto>,
+    blueSkuCollection: SkuCollection,
     redAttributes: MutableList<AttributeDto>,
-    greenAttributes: MutableList<AttributeDto>
+    redSkuCollection: SkuCollection,
+    greenAttributes: MutableList<AttributeDto>,
+    greenSkuCollection: SkuCollection
 ) = CreateProductRequest(
     shopId = shopId,
     categoryName = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME,
     name = PRODUCT_T_SHIRT_NAME,
     description = PRODUCT_T_SHIRT_DESCRIPTION,
-    variants = tShirtVariantDtos(blueAttributes, redAttributes, greenAttributes)
+    variants = tShirtVariantDtos(
+        blueAttributes,
+        blueSkuCollection,
+        redAttributes,
+        redSkuCollection,
+        greenAttributes,
+        greenSkuCollection
+    )
 )
 
 fun colorAttributeRequest() = ColorAttributeDto(
@@ -362,21 +372,24 @@ fun colorAttributeDomain(): Attribute {
 
 fun tShirtVariantDtos(
     blueAttributes: MutableList<AttributeDto>,
+    blueSkuCollection: SkuCollection,
     redAttributes: MutableList<AttributeDto>,
-    greenAttributes: MutableList<AttributeDto>
+    redSkuCollection: SkuCollection,
+    greenAttributes: MutableList<AttributeDto>,
+    greenSkuCollection: SkuCollection
 ): Set<ProductVariantRequestDto> =
     hashSetOf(
-        blueTShirtVariantDto(blueAttributes),
-        greenTShirtVariantDto(greenAttributes),
-        redTShirtVariantDto(redAttributes)
+        blueTShirtVariantDto(blueAttributes, blueSkuCollection),
+        greenTShirtVariantDto(greenAttributes, greenSkuCollection),
+        redTShirtVariantDto(redAttributes, redSkuCollection)
     )
 
 fun blueTShirtVariantDto(
-    attributes: MutableList<AttributeDto>
+    attributes: MutableList<AttributeDto>,
+    skuCollection: SkuCollection
 ) = ProductVariantRequestDto(
     variantName = T_SHIRT_BLUE_VARIANT_NAME,
     price = BigDecimal.TEN,
-    stock = 10,
     images = ImageCollection(
         images = arrayListOf(
             AppImage(
@@ -388,15 +401,16 @@ fun blueTShirtVariantDto(
             )
         )
     ),
-    attributeCollection = AttributeCollection(attributes)
+    attributeCollection = AttributeCollection(attributes),
+    skuCollection = skuCollection
 )
 
 fun redTShirtVariantDto(
-    attributes: MutableList<AttributeDto>
+    attributes: MutableList<AttributeDto>,
+    skuCollection: SkuCollection
 ) = ProductVariantRequestDto(
     variantName = T_SHIRT_RED_VARIANT_NAME,
     price = BigDecimal.TEN,
-    stock = 10,
     images = ImageCollection(
         images = arrayListOf(
             AppImage(
@@ -408,15 +422,16 @@ fun redTShirtVariantDto(
             )
         )
     ),
-    attributeCollection = AttributeCollection(attributes)
+    attributeCollection = AttributeCollection(attributes),
+    skuCollection = skuCollection
 )
 
 fun greenTShirtVariantDto(
-    attributes: MutableList<AttributeDto>
+    attributes: MutableList<AttributeDto>,
+    skuCollection: SkuCollection
 ) = ProductVariantRequestDto(
     variantName = T_SHIRT_GREEN_VARIANT_NAME,
     price = BigDecimal.TEN,
-    stock = 10,
     images = ImageCollection(
         images = arrayListOf(
             AppImage(
@@ -428,5 +443,6 @@ fun greenTShirtVariantDto(
             )
         )
     ),
-    attributeCollection = AttributeCollection(attributes)
+    attributeCollection = AttributeCollection(attributes),
+    skuCollection = skuCollection
 )

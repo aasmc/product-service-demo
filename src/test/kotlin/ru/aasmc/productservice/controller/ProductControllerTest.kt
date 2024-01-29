@@ -6,6 +6,7 @@ import org.springframework.http.MediaType
 import ru.aasmc.productservice.BaseIntegTest
 import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.testdata.*
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class ProductControllerTest : BaseIntegTest() {
@@ -93,11 +94,86 @@ class ProductControllerTest : BaseIntegTest() {
             colorAttr.copy(availableValues = listOf(green))
         )
 
+        val blueSkuCollection = SkuCollection(
+            attrName = sizeAttr.attributeName,
+            skus = listOf(
+                Sku(
+                    attrValue = SIZE_XS_VALUE,
+                    sku = "t-shirt/blue/XS/Brand/230",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+                 Sku(
+                    attrValue = SIZE_S_VALUE,
+                     sku = "t-shirt/blue/S/Brand/231",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+                 Sku(
+                    attrValue = SIZE_M_VALUE,
+                     sku = "t-shirt/blue/M/Brand/232",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+            )
+        )
+
+        val greenSkuCollection = SkuCollection(
+            attrName = sizeAttr.attributeName,
+            skus = listOf(
+                Sku(
+                    attrValue = SIZE_S_VALUE,
+                    sku = "t-shirt/green/S/Brand/233",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+                Sku(
+                    attrValue = SIZE_M_VALUE,
+                    sku = "t-shirt/green/M/Brand/234",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+                Sku(
+                    attrValue = SIZE_L_VALUE,
+                    sku = "t-shirt/green/L/Brand/235",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+            )
+        )
+
+        val redSkuCollection = SkuCollection(
+            attrName = sizeAttr.attributeName,
+            skus = listOf(
+                Sku(
+                    attrValue = SIZE_M_VALUE,
+                    sku = "t-shirt/red/M/Brand/236",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+                Sku(
+                    attrValue = SIZE_L_VALUE,
+                    sku = "t-shirt/red/L/Brand/237",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+                Sku(
+                    attrValue = SIZE_XL_VALUE,
+                    sku = "t-shirt/red/XL/Brand/238",
+                    price = BigDecimal.TEN,
+                    stock = 10
+                ),
+            )
+        )
+
         val tShirtRequest = createTshirtRequest(
             shopResponse.id,
             blueAttributes,
+            blueSkuCollection,
             redAttributes,
-            greenAttributes
+            redSkuCollection,
+            greenAttributes,
+            greenSkuCollection
         )
 
         val now = LocalDateTime.now()
@@ -128,6 +204,9 @@ class ProductControllerTest : BaseIntegTest() {
                 assertThat(redVariant.attributesCollection.attributes).hasSize(2)
                 assertThat(blueVariant.attributesCollection.attributes).hasSize(2)
                 assertThat(greenVariant.attributesCollection.attributes).hasSize(2)
+                assertThat(redVariant.skuCollection).isEqualTo(redSkuCollection)
+                assertThat(blueVariant.skuCollection).isEqualTo(blueSkuCollection)
+                assertThat(greenVariant.skuCollection).isEqualTo(greenSkuCollection)
             }
 
     }
