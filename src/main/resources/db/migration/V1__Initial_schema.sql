@@ -97,3 +97,22 @@ CREATE TABLE product_outbox (
 );
 
 
+CREATE TABLE product_variant_outbox (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    event_type VARCHAR(50) NOT NULL,
+    event_data JSONB,
+    event_timestamp TIMESTAMP NOT NULL
+);
+
+CREATE TABLE product_update_outbox(
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    event_timestamp TIMESTAMP NOT NULL,
+    event_data JSONB
+);
+
+CREATE TABLE product_sku_updates(
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    event_timestamp TIMESTAMP NOT NULL,
+    event_data JSONB
+)

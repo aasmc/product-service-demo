@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "product_outbox")
+@org.hibernate.annotations.Immutable
 class ProductOutbox(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +22,13 @@ class ProductOutbox(
     @org.hibernate.annotations.Type(JsonBinaryType::class)
     @Column(columnDefinition = "jsonb", name = "event_data")
     var eventData: ProductEventData?
-)
+) {
+
+    override fun toString(): String {
+        return "ProductOutbox(id=$id, " +
+                "productId=$productId, " +
+                "eventType=$eventType, " +
+                "eventTimestamp=$eventTimestamp, " +
+                "eventData=$eventData)"
+    }
+}

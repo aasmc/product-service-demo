@@ -2,24 +2,56 @@ package ru.aasmc.productservice.service.impl
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import ru.aasmc.productservice.service.ProductOutboxService
+import ru.aasmc.productservice.service.OutboxService
 import ru.aasmc.productservice.storage.model.*
 import ru.aasmc.productservice.storage.repository.ProductOutboxRepository
+import ru.aasmc.productservice.storage.repository.ProductVariantOutboxRepository
 
 @Service
 class ProductOutboxServiceImpl(
-    private val productOutboxRepository: ProductOutboxRepository
-) : ProductOutboxService {
+    private val productOutboxRepository: ProductOutboxRepository,
+    private val productVariantOutboxRepository: ProductVariantOutboxRepository
+) : OutboxService {
 
-    override fun addEvent(productId: Long, product: Product?, eventType: EventType) {
+    override fun addProductEvent(productId: Long, product: Product?, eventType: EventType) {
         val productOutbox = ProductOutbox(
             productId = productId,
             eventType = eventType,
             eventData = if (eventType == EventType.DELETE) null else buildProductEventData(product!!)
         )
-        log.debug("Saving event to outbox table: {}", productOutbox)
+        log.debug("Saving product event to outbox table: {}", productOutbox)
         productOutboxRepository.save(productOutbox)
     }
+
+    override fun addProductVariantEvent(
+        productId: Long,
+        productVariantId: Long,
+        eventType: EventType,
+        productVariant: ProductVariant?
+    ) {
+        val outbox = ProductVariantOutbox(
+            variantId = productVariantId,
+            productId = productId,
+            eventType = eventType,
+            eventData = if (eventType == EventType.DELETE) null
+            else buildProductVariantEventData(productId, productVariant!!)
+        )
+        log.debug("Saving product variant event to outbox table: {}", outbox)
+        productVariantOutboxRepository.save(outbox)
+    }
+
+    private fun buildProductVariantEventData(
+        productId: Long,
+        productVariant: ProductVariant
+    ) = ProductVariantEventData(
+        variantId = productVariant.id!!,
+        productId = productId,
+        variantName = productVariant.variantName,
+        price = productVariant.price,
+        attributes = productVariant.attributes,
+        images = productVariant.images,
+        skuCollection = productVariant.skuCollection
+    )
 
 
     private fun buildProductEventData(product: Product): ProductEventData {
