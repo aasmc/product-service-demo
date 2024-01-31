@@ -1,12 +1,12 @@
-package ru.aasmc.productservice.storage.model
+package ru.aasmc.productservice.storage.model.jsonb_data
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonValue
 import ru.aasmc.productservice.dto.*
-import ru.aasmc.productservice.storage.model.ProductUpdateReason.*
-import ru.aasmc.productservice.storage.model.SkuUpdateReason.UPDATE_PRICE
-import ru.aasmc.productservice.storage.model.SkuUpdateReason.UPDATE_STOCK
+import ru.aasmc.productservice.storage.model.jsonb_data.ProductUpdateReason.*
+import ru.aasmc.productservice.storage.model.jsonb_data.SkuUpdateReason.UPDATE_PRICE
+import ru.aasmc.productservice.storage.model.jsonb_data.SkuUpdateReason.UPDATE_STOCK
 import java.math.BigDecimal
 
 
@@ -54,7 +54,7 @@ enum class ProductUpdateReason(
         name = "pv_price"
     )
 ))
-sealed class ProductUpdates(
+sealed class ProductUpdate(
     open val reason: ProductUpdateReason
 )
 
@@ -62,41 +62,40 @@ data class UpdatePVPhotos(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_VARIANT_PHOTOS,
     val variantId: Long,
     val newPhotos: ImageCollection
-): ProductUpdates(reason)
+): ProductUpdate(reason)
 
 data class UpdatePVName(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_VARIANT_NAME,
     val variantId: Long,
     val prevName: String,
     val newName: String,
-): ProductUpdates(reason)
+): ProductUpdate(reason)
 
 data class UpdatePVPrice(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_VARIANT_PRICE,
     val variantId: Long,
     val prevPrice: BigDecimal,
     val newPrice: BigDecimal
-): ProductUpdates(reason)
+): ProductUpdate(reason)
 
 data class UpdatePVAttributes(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_VARIANT_ATTRIBUTES,
     val variantId: Long,
     val newAttributes: AttributeCollection
-): ProductUpdates(reason)
+): ProductUpdate(reason)
 
 data class UpdateProductName(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_NAME,
     val productId: Long,
     val prevName: String,
     val newName: String,
-): ProductUpdates(reason)
+): ProductUpdate(reason)
 
 data class UpdateProductDescription(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_DESCRIPTION,
     val productId: Long,
-    val prevDescription: String,
     val newDescription: String
-): ProductUpdates(reason)
+): ProductUpdate(reason)
 
 
 enum class SkuUpdateReason(
@@ -124,7 +123,7 @@ enum class SkuUpdateReason(
         )
     )
 )
-sealed class SkuUpdates(
+sealed class SkuUpdate(
     open val reason: SkuUpdateReason,
     open val variantId: Long,
     open val sku: String,
@@ -136,7 +135,7 @@ data class UpdateSkuStock(
     override val sku: String,
     val prevStock: Int,
     val newStock: Int
-): SkuUpdates(reason, variantId, sku)
+): SkuUpdate(reason, variantId, sku)
 
 data class UpdateSkuPrice(
     override val reason: SkuUpdateReason = UPDATE_PRICE,
@@ -144,4 +143,4 @@ data class UpdateSkuPrice(
     override val sku: String,
     val prevPrice: BigDecimal,
     val newPrice: BigDecimal
-): SkuUpdates(reason, variantId, sku)
+): SkuUpdate(reason, variantId, sku)

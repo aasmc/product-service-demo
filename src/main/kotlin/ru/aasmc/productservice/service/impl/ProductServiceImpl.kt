@@ -8,9 +8,9 @@ import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.errors.ProductServiceException
 import ru.aasmc.productservice.mapper.ProductMapper
 import ru.aasmc.productservice.mapper.ProductVariantMapper
-import ru.aasmc.productservice.service.OutboxService
+import ru.aasmc.productservice.service.ProductOutboxService
 import ru.aasmc.productservice.service.ProductService
-import ru.aasmc.productservice.storage.model.EventType
+import ru.aasmc.productservice.storage.model.jsonb_data.EventType
 import ru.aasmc.productservice.storage.repository.ProductRepository
 import ru.aasmc.productservice.storage.repository.ProductVariantRepository
 import ru.aasmc.productservice.utils.CryptoTool
@@ -23,7 +23,7 @@ class ProductServiceImpl(
     private val mapper: ProductMapper,
     private val productVariantMapper: ProductVariantMapper,
     private val productVariantRepository: ProductVariantRepository,
-    private val outboxService: OutboxService
+    private val productOutboxService: ProductOutboxService
 ): ProductService {
 
     override fun createProduct(dto: CreateProductRequest): ProductResponse {
@@ -31,7 +31,7 @@ class ProductServiceImpl(
         // category have been filled, or is a check-up on front enough?
         val product = productRepository.save(mapper.toDomain(dto))
         log.debug("Successfully saved product: {}", product)
-        outboxService.addProductEvent(product.id!!, product, EventType.INSERT)
+        productOutboxService.addProductEvent(product.id!!, product, EventType.INSERT)
         return mapper.toProductResponseDto(product)
     }
 
@@ -66,7 +66,7 @@ class ProductServiceImpl(
         productRepository.save(product)
         productRepository.flush()
         log.debug("Successfully added variant {} to product {}", variant, product)
-        outboxService.addProductVariantEvent(product.id!!, variant.id!!, EventType.INSERT, variant)
+        productOutboxService.addProductVariantEvent(product.id!!, variant.id!!, EventType.INSERT, variant)
         return productVariantMapper.toProductVariantFullResponse(variant)
     }
 
@@ -81,7 +81,7 @@ class ProductServiceImpl(
         product.variants.removeIf { variant -> variant.id == id }
         productVariantRepository.deleteById(cryptoTool.idOf(variantId))
         log.debug("Successfully deleted product variant with ID=$variantId")
-        outboxService.addProductVariantEvent(product.id!!, id, EventType.DELETE, null)
+        productOutboxService.addProductVariantEvent(product.id!!, id, EventType.DELETE, null)
         productRepository.save(product)
     }
 
@@ -95,7 +95,15 @@ class ProductServiceImpl(
         product.shop.products.remove(product)
         productRepository.deleteById(id)
         log.debug("Successfully deleted product with ID=$productId")
-        outboxService.addProductEvent(cryptoTool.idOf(productId), null, EventType.DELETE)
+        productOutboxService.addProductEvent(cryptoTool.idOf(productId), null, EventType.DELETE)
+    }
+
+    override fun updateName(productId: String, newName: String): ProductResponse {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateDescription(productId: String, newDescription: String): ProductResponse {
+        TODO("Not yet implemented")
     }
 
     companion object {

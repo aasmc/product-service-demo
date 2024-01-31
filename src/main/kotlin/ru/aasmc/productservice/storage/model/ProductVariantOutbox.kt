@@ -9,6 +9,8 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import ru.aasmc.productservice.storage.model.jsonb_data.EventType
+import ru.aasmc.productservice.storage.model.jsonb_data.ProductVariantEventData
 import java.time.LocalDateTime
 
 @Entity

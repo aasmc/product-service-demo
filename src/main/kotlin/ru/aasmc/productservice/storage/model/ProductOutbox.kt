@@ -2,6 +2,8 @@ package ru.aasmc.productservice.storage.model
 
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType
 import jakarta.persistence.*
+import ru.aasmc.productservice.storage.model.jsonb_data.EventType
+import ru.aasmc.productservice.storage.model.jsonb_data.ProductEventData
 import java.time.LocalDateTime
 
 @Entity

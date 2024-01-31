@@ -111,7 +111,7 @@ CREATE TABLE product_update_outbox(
     event_data JSONB
 );
 
-CREATE TABLE product_sku_updates(
+CREATE TABLE product_sku_update_outbox(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     event_timestamp TIMESTAMP NOT NULL,
     event_data JSONB

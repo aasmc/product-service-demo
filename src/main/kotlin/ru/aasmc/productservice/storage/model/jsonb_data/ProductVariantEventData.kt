@@ -1,4 +1,4 @@
-package ru.aasmc.productservice.storage.model
+package ru.aasmc.productservice.storage.model.jsonb_data
 
 import ru.aasmc.productservice.dto.AttributeCollection
 import ru.aasmc.productservice.dto.ImageCollection

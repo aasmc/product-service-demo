@@ -2,8 +2,12 @@ package ru.aasmc.productservice.service.impl
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import ru.aasmc.productservice.service.OutboxService
+import ru.aasmc.productservice.service.ProductOutboxService
 import ru.aasmc.productservice.storage.model.*
+import ru.aasmc.productservice.storage.model.jsonb_data.EventType
+import ru.aasmc.productservice.storage.model.jsonb_data.ProductEventData
+import ru.aasmc.productservice.storage.model.jsonb_data.ProductEventVariant
+import ru.aasmc.productservice.storage.model.jsonb_data.ProductVariantEventData
 import ru.aasmc.productservice.storage.repository.ProductOutboxRepository
 import ru.aasmc.productservice.storage.repository.ProductVariantOutboxRepository
 
@@ -11,7 +15,7 @@ import ru.aasmc.productservice.storage.repository.ProductVariantOutboxRepository
 class ProductOutboxServiceImpl(
     private val productOutboxRepository: ProductOutboxRepository,
     private val productVariantOutboxRepository: ProductVariantOutboxRepository
-) : OutboxService {
+) : ProductOutboxService {
 
     override fun addProductEvent(productId: Long, product: Product?, eventType: EventType) {
         val productOutbox = ProductOutbox(
