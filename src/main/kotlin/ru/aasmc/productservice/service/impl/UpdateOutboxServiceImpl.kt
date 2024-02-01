@@ -14,8 +14,8 @@ import java.math.BigDecimal
 
 @Service
 class UpdateOutboxServiceImpl(
-    private val productUpdateOutboxRepository: ProductUpdateOutboxRepository,
-    private val productSkuUpdateOutboxRepository: ProductSkuUpdateOutboxRepository
+    private val productUpdateRepo: ProductUpdateOutboxRepository,
+    private val skuUpdateRepo: ProductSkuUpdateOutboxRepository
 ) : UpdateOutboxService {
     override fun sendUpdatePVPhotosEvent(
         variantId: Long,
@@ -127,7 +127,7 @@ class UpdateOutboxServiceImpl(
         var event = ProductSkuUpdateOutbox(
             eventData = data
         )
-        event = productSkuUpdateOutboxRepository.save(event)
+        event = skuUpdateRepo.save(event)
         log.info(logMsg(), event)
     }
 
@@ -138,7 +138,7 @@ class UpdateOutboxServiceImpl(
         var event = ProductUpdateOutbox(
             eventData = data
         )
-        event = productUpdateOutboxRepository.save(event)
+        event = productUpdateRepo.save(event)
         log.info(logMsg(), event)
     }
 

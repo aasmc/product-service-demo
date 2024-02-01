@@ -16,8 +16,10 @@ interface ProductService {
 
     fun deleteProduct(productId: String)
 
-    fun updateName(productId: String, newName: String): ProductResponse
+    fun updateProduct(
+        productId: String,
+        update: ProductUpdateDto
+    ): ProductResponse
 
-    fun updateDescription(productId: String, newDescription: String): ProductResponse
 
 }

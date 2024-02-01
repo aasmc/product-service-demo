@@ -1,9 +1,6 @@
 package ru.aasmc.productservice.service
 
-import ru.aasmc.productservice.dto.UpdateSkuPriceDto
-import ru.aasmc.productservice.dto.UpdateSkuPriceResponse
-import ru.aasmc.productservice.dto.UpdateSkuStockRequest
-import ru.aasmc.productservice.dto.UpdateSkuStockResponse
+import ru.aasmc.productservice.dto.*
 
 interface ProductVariantService {
 
@@ -11,6 +8,28 @@ interface ProductVariantService {
 
     fun updateSkuPrice(dto: UpdateSkuPriceDto): UpdateSkuPriceResponse
 
-    
+    fun updateVariantPrice(dto: UpdateProductVariantPriceDto): ProductVariantResponse
+
+    fun updateVariantName(variantId: String, newName: String): ProductVariantResponse
+
+    fun addVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse
+
+    fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse
+
+    fun addVariantAttribute(variantId: String, attribute: AttributeDto): ProductVariantResponse
+
+    fun removeVariantAttribute(variantId: String, attributeName: String): ProductVariantResponse
+
+    fun addAttributeValue(
+        variantId: String,
+        attributeName: String,
+        value: AttributeValueDto
+    ): ProductVariantResponse
+
+    fun removeAttributeValue(
+        variantId: String,
+        attributeName: String,
+        value: AttributeValueDto
+    ): ProductVariantResponse
 
 }

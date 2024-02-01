@@ -26,3 +26,13 @@ data class UpdateSkuPriceResponse(
     val newPrice: BigDecimal
 )
 
+data class UpdateProductVariantPriceDto(
+    val productId: String,
+    val productVariantId: String,
+    val newPrice: BigDecimal
+)
+
+data class ProductUpdateDto(
+    val newName: String?,
+    val newDescription: String?
+)

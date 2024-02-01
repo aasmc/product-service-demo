@@ -13,8 +13,8 @@ import ru.aasmc.productservice.storage.repository.ProductVariantOutboxRepository
 
 @Service
 class ProductOutboxServiceImpl(
-    private val productOutboxRepository: ProductOutboxRepository,
-    private val productVariantOutboxRepository: ProductVariantOutboxRepository
+    private val productOutboxRepo: ProductOutboxRepository,
+    private val variantOutboxRepo: ProductVariantOutboxRepository
 ) : ProductOutboxService {
 
     override fun addProductEvent(productId: Long, product: Product?, eventType: EventType) {
@@ -24,7 +24,7 @@ class ProductOutboxServiceImpl(
             eventData = if (eventType == EventType.DELETE) null else buildProductEventData(product!!)
         )
         log.debug("Saving product event to outbox table: {}", productOutbox)
-        productOutboxRepository.save(productOutbox)
+        productOutboxRepo.save(productOutbox)
     }
 
     override fun addProductVariantEvent(
@@ -41,7 +41,7 @@ class ProductOutboxServiceImpl(
             else buildProductVariantEventData(productId, productVariant!!)
         )
         log.debug("Saving product variant event to outbox table: {}", outbox)
-        productVariantOutboxRepository.save(outbox)
+        variantOutboxRepo.save(outbox)
     }
 
     private fun buildProductVariantEventData(

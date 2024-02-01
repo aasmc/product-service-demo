@@ -32,7 +32,10 @@ class ProductController(
     }
 
     @PutMapping("/{productId}/variant")
-    fun addProductVariant(@PathVariable("productId") productId: String, dto: ProductVariantRequestDto): ProductVariantResponse {
+    fun addProductVariant(
+        @PathVariable("productId") productId: String,
+        dto: ProductVariantRequestDto
+    ): ProductVariantResponse {
         log.info("Received PUT request to add product variant: {}", dto)
         return productService.addProductVariant(productId, dto)
     }
@@ -52,6 +55,18 @@ class ProductController(
     fun deleteProduct(@PathVariable("productId") productId: String) {
         log.info("Received request to DELETE product with ID={}", productId)
         productService.deleteProduct(productId)
+    }
+
+    @PutMapping("/{productId}")
+    fun updateProduct(
+        @PathVariable productId: String,
+        @RequestBody dto: ProductUpdateDto
+        ): ProductResponse {
+        log.info(
+            "Received PUT request to update product with ID={}. Update={}",
+            productId, dto
+        )
+        return productService.updateProduct(productId, dto)
     }
 
     companion object {
