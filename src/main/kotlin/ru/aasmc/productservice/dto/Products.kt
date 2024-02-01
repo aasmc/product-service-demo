@@ -1,5 +1,7 @@
 package ru.aasmc.productservice.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonValue
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import kotlin.properties.Delegates
@@ -58,13 +60,12 @@ data class ProductVariantRequestDto(
  */
 data class Sku(
     val attrValue: String,
-    val sku: String,
     val price: BigDecimal,
     val stock: Int,
+    val sku: String
 )
 
 data class SkuCollection(
-    // нащвание атрибута, который является определяющим для конкретной единицы товара
     val attrName: String,
     val skus: List<Sku>
 )

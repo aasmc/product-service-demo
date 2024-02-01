@@ -100,6 +100,7 @@ CREATE TABLE product_outbox (
 CREATE TABLE product_variant_outbox (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     product_id BIGINT NOT NULL,
+    variant_id BIGINT NOT NULL,
     event_type VARCHAR(50) NOT NULL,
     event_data JSONB,
     event_timestamp TIMESTAMP NOT NULL

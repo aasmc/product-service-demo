@@ -6,44 +6,45 @@ import java.math.BigDecimal
 
 interface UpdateOutboxService {
 
-    fun sendUpdatePVPhotosEvent(
+    fun saveUpdatePVPhotosEvent(
         variantId: Long,
         newPhotos: ImageCollection
     )
 
-    fun sendUpdatePVPriceEvent(
+    fun saveUpdatePVPriceEvent(
         variantId: Long,
-        prevPrice: BigDecimal,
         newPrice: BigDecimal
     )
 
-    fun sendUpdatePVAttributesEvent(
+    fun saveUpdatePVAttributesEvent(
         variantId: Long,
         newAttributes: AttributeCollection
     )
 
-    fun sendUpdateProductNameEvent(
-        productId: Long,
-        prevName: String,
+    fun saveUpdatePVNameEvent(
+        variantId: Long,
         newName: String
     )
 
-    fun sendUpdateProductDescriptionEvent(
+    fun saveUpdateProductNameEvent(
+        productId: Long,
+        newName: String
+    )
+
+    fun saveUpdateProductDescriptionEvent(
         productId: Long,
         newDescription: String
     )
 
-    fun sendUpdateSkuStockEvent(
+    fun saveUpdateSkuStockEvent(
         variantId: Long,
         sku: String,
-        prevStock: Int,
         newStock: Int
     )
 
-    fun sendUpdateSkuPriceEvent(
+    fun saveUpdateSkuPriceEvent(
         variantId: Long,
         sku: String,
-        prevPrice: BigDecimal,
         newPrice: BigDecimal
     )
 

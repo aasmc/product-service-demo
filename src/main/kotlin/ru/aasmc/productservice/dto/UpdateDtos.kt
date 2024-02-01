@@ -3,7 +3,6 @@ package ru.aasmc.productservice.dto
 import java.math.BigDecimal
 
 data class UpdateSkuStockRequest(
-    val productId: String,
     val productVariantId: String,
     val sku: String,
     val newStock: Int
@@ -15,7 +14,6 @@ data class UpdateSkuStockResponse(
 )
 
 data class UpdateSkuPriceDto(
-    val productId: String,
     val productVariantId: String,
     val sku: String,
     val newPrice: BigDecimal
@@ -27,7 +25,6 @@ data class UpdateSkuPriceResponse(
 )
 
 data class UpdateProductVariantPriceDto(
-    val productId: String,
     val productVariantId: String,
     val newPrice: BigDecimal
 )

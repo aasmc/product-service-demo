@@ -67,14 +67,12 @@ data class UpdatePVPhotos(
 data class UpdatePVName(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_VARIANT_NAME,
     val variantId: Long,
-    val prevName: String,
     val newName: String,
 ): ProductUpdate(reason)
 
 data class UpdatePVPrice(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_VARIANT_PRICE,
     val variantId: Long,
-    val prevPrice: BigDecimal,
     val newPrice: BigDecimal
 ): ProductUpdate(reason)
 
@@ -87,7 +85,6 @@ data class UpdatePVAttributes(
 data class UpdateProductName(
     override val reason: ProductUpdateReason = UPDATE_PRODUCT_NAME,
     val productId: Long,
-    val prevName: String,
     val newName: String,
 ): ProductUpdate(reason)
 
@@ -133,7 +130,6 @@ data class UpdateSkuStock(
     override val reason: SkuUpdateReason = UPDATE_STOCK,
     override val variantId: Long,
     override val sku: String,
-    val prevStock: Int,
     val newStock: Int
 ): SkuUpdate(reason, variantId, sku)
 
@@ -141,6 +137,5 @@ data class UpdateSkuPrice(
     override val reason: SkuUpdateReason = UPDATE_PRICE,
     override val variantId: Long,
     override val sku: String,
-    val prevPrice: BigDecimal,
     val newPrice: BigDecimal
 ): SkuUpdate(reason, variantId, sku)

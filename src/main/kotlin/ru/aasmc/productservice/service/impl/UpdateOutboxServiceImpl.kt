@@ -17,7 +17,7 @@ class UpdateOutboxServiceImpl(
     private val productUpdateRepo: ProductUpdateOutboxRepository,
     private val skuUpdateRepo: ProductSkuUpdateOutboxRepository
 ) : UpdateOutboxService {
-    override fun sendUpdatePVPhotosEvent(
+    override fun saveUpdatePVPhotosEvent(
         variantId: Long,
         newPhotos: ImageCollection
     ) {
@@ -30,14 +30,12 @@ class UpdateOutboxServiceImpl(
         }
     }
 
-    override fun sendUpdatePVPriceEvent(
+    override fun saveUpdatePVPriceEvent(
         variantId: Long,
-        prevPrice: BigDecimal,
         newPrice: BigDecimal
     ) {
         val data = UpdatePVPrice(
             variantId = variantId,
-            prevPrice = prevPrice,
             newPrice = newPrice
         )
         saveProductUpdate(data) {
@@ -45,7 +43,7 @@ class UpdateOutboxServiceImpl(
         }
     }
 
-    override fun sendUpdatePVAttributesEvent(
+    override fun saveUpdatePVAttributesEvent(
         variantId: Long,
         newAttributes: AttributeCollection
     ) {
@@ -58,14 +56,22 @@ class UpdateOutboxServiceImpl(
         }
     }
 
-    override fun sendUpdateProductNameEvent(
+    override fun saveUpdatePVNameEvent(variantId: Long, newName: String) {
+        val data = UpdatePVName(
+            variantId = variantId,
+            newName = newName
+        )
+        saveProductUpdate(data) {
+            "Successfully saved UpdatePVNameEvent: {}"
+        }
+    }
+
+    override fun saveUpdateProductNameEvent(
         productId: Long,
-        prevName: String,
         newName: String
     ) {
         val data = UpdateProductName(
             productId = productId,
-            prevName = prevName,
             newName = newName
         )
         saveProductUpdate(data) {
@@ -73,7 +79,7 @@ class UpdateOutboxServiceImpl(
         }
     }
 
-    override fun sendUpdateProductDescriptionEvent(
+    override fun saveUpdateProductDescriptionEvent(
         productId: Long,
         newDescription: String
     ) {
@@ -86,16 +92,14 @@ class UpdateOutboxServiceImpl(
         }
     }
 
-    override fun sendUpdateSkuStockEvent(
+    override fun saveUpdateSkuStockEvent(
         variantId: Long,
         sku: String,
-        prevStock: Int,
         newStock: Int
     ) {
         val data = UpdateSkuStock(
             variantId = variantId,
             sku = sku,
-            prevStock = prevStock,
             newStock = newStock
         )
         saveSkuUpdate(data) {
@@ -103,16 +107,14 @@ class UpdateOutboxServiceImpl(
         }
     }
 
-    override fun sendUpdateSkuPriceEvent(
+    override fun saveUpdateSkuPriceEvent(
         variantId: Long,
         sku: String,
-        prevPrice: BigDecimal,
         newPrice: BigDecimal
     ) {
         val data = UpdateSkuPrice(
             variantId = variantId,
             sku = sku,
-            prevPrice = prevPrice,
             newPrice = newPrice
         )
         saveSkuUpdate(data) {
