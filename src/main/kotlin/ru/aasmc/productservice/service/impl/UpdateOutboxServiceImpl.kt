@@ -25,9 +25,7 @@ class UpdateOutboxServiceImpl(
             variantId = variantId,
             newPhotos = newPhotos
         )
-        saveProductUpdate(data) {
-            "Successfully saved UpdatePVPhotosEvent: {}"
-        }
+        saveProductUpdate(data, "Successfully saved UpdatePVPhotosEvent: {}")
     }
 
     override fun saveUpdatePVPriceEvent(
@@ -38,9 +36,7 @@ class UpdateOutboxServiceImpl(
             variantId = variantId,
             newPrice = newPrice
         )
-        saveProductUpdate(data) {
-            "Successfully saved UpdatePVPriceEvent: {}"
-        }
+        saveProductUpdate(data, "Successfully saved UpdatePVPriceEvent: {}")
     }
 
     override fun saveUpdatePVAttributesEvent(
@@ -51,9 +47,7 @@ class UpdateOutboxServiceImpl(
             variantId = variantId,
             newAttributes = newAttributes
         )
-        saveProductUpdate(data) {
-            "Successfully saved UpdatePVAttributeEvent: {}"
-        }
+        saveProductUpdate(data, "Successfully saved UpdatePVAttributeEvent: {}")
     }
 
     override fun saveUpdatePVNameEvent(variantId: Long, newName: String) {
@@ -61,9 +55,7 @@ class UpdateOutboxServiceImpl(
             variantId = variantId,
             newName = newName
         )
-        saveProductUpdate(data) {
-            "Successfully saved UpdatePVNameEvent: {}"
-        }
+        saveProductUpdate(data, "Successfully saved UpdatePVNameEvent: {}")
     }
 
     override fun saveUpdateProductNameEvent(
@@ -74,9 +66,7 @@ class UpdateOutboxServiceImpl(
             productId = productId,
             newName = newName
         )
-        saveProductUpdate(data) {
-            "Successfully saved UpdateProductNameEvent: {}"
-        }
+        saveProductUpdate(data, "Successfully saved UpdateProductNameEvent: {}")
     }
 
     override fun saveUpdateProductDescriptionEvent(
@@ -87,9 +77,8 @@ class UpdateOutboxServiceImpl(
             productId = productId,
             newDescription = newDescription
         )
-        saveProductUpdate(data) {
-            "Successfully save UpdateProductDescriptionEvent: {}"
-        }
+
+        saveProductUpdate(data, "Successfully save UpdateProductDescriptionEvent: {}")
     }
 
     override fun saveUpdateSkuStockEvent(
@@ -102,9 +91,7 @@ class UpdateOutboxServiceImpl(
             sku = sku,
             newStock = newStock
         )
-        saveSkuUpdate(data) {
-            "Successfully saved UpdateSkuStockEvent: {}"
-        }
+        saveSkuUpdate(data, "Successfully saved UpdateSkuStockEvent: {}")
     }
 
     override fun saveUpdateSkuPriceEvent(
@@ -117,31 +104,29 @@ class UpdateOutboxServiceImpl(
             sku = sku,
             newPrice = newPrice
         )
-        saveSkuUpdate(data) {
-            "Successfully saved UpdateSkuPriceEvent: {}"
-        }
+        saveSkuUpdate(data,  "Successfully saved UpdateSkuPriceEvent: {}")
     }
 
     private fun saveSkuUpdate(
         data: SkuUpdate,
-        logMsg: () -> String
+        logMsg: String
     ) {
         var event = ProductSkuUpdateOutbox(
             eventData = data
         )
         event = skuUpdateRepo.save(event)
-        log.info(logMsg(), event)
+        log.info(logMsg, event)
     }
 
     private fun saveProductUpdate(
         data: ProductUpdate,
-        logMsg: () -> String
+        logMsg: String
     ) {
         var event = ProductUpdateOutbox(
             eventData = data
         )
         event = productUpdateRepo.save(event)
-        log.info(logMsg(), event)
+        log.info(logMsg, event)
     }
 
     companion object {

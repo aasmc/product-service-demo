@@ -3,7 +3,6 @@ package ru.aasmc.productservice.service.impl
 import jakarta.transaction.Transactional
 import org.hibernate.exception.ConstraintViolationException
 import org.slf4j.LoggerFactory
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import ru.aasmc.productservice.dto.*
@@ -71,37 +70,13 @@ class AttributeServiceImpl(
     ): AttributeValueDto {
         when(val attr = getAttributeOrThrow(attributeId)) {
             is StringAttribute -> {
-                when(dto) {
-                    is StringAttributeValueDto -> {
-                        attr.stringValues.add(dto)
-                    }
-                    else -> {
-                        val msg = "Attribute Value class ${dto::class} is not compatible with StringAttribute type. "
-                        throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
-                    }
-                }
+                addStringAttributeValue(dto, attr)
             }
             is NumericAttribute -> {
-                when(dto) {
-                    is NumericAttributeValueDto -> {
-                        attr.numericValues.add(dto)
-                    }
-                    else -> {
-                        val msg = "Attribute Value class ${dto::class} is not compatible with NumericAttribute type. "
-                        throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
-                    }
-                }
+                addNumericAttributeValue(dto, attr)
             }
             is ColorAttribute -> {
-                when(dto) {
-                    is ColorAttributeValueDto -> {
-                        attr.colorValues.add(dto)
-                    }
-                    else -> {
-                        val msg = "Attribute Value class ${dto::class} is not compatible with NumericAttribute type. "
-                        throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
-                    }
-                }
+                addColorAttributeValue(dto, attr)
             }
             else -> {
                 val msg = "Unknown attribute type when adding value to attribute"
@@ -111,6 +86,54 @@ class AttributeServiceImpl(
 
         log.debug("Successfully added value: {}, to attribute with ID={}", dto, attributeId)
         return dto
+    }
+
+    private fun addColorAttributeValue(
+        dto: AttributeValueDto,
+        attr: ColorAttribute
+    ) {
+        when (dto) {
+            is ColorAttributeValueDto -> {
+                attr.colorValues.add(dto)
+            }
+
+            else -> {
+                val msg = "Attribute Value class ${dto::class} is not compatible with NumericAttribute type. "
+                throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
+            }
+        }
+    }
+
+    private fun addNumericAttributeValue(
+        dto: AttributeValueDto,
+        attr: NumericAttribute
+    ) {
+        when (dto) {
+            is NumericAttributeValueDto -> {
+                attr.numericValues.add(dto)
+            }
+
+            else -> {
+                val msg = "Attribute Value class ${dto::class} is not compatible with NumericAttribute type. "
+                throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
+            }
+        }
+    }
+
+    private fun addStringAttributeValue(
+        dto: AttributeValueDto,
+        attr: StringAttribute
+    ) {
+        when (dto) {
+            is StringAttributeValueDto -> {
+                attr.stringValues.add(dto)
+            }
+
+            else -> {
+                val msg = "Attribute Value class ${dto::class} is not compatible with StringAttribute type. "
+                throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
+            }
+        }
     }
 
     private fun getAttributeOrThrow(attributeId: String): Attribute =

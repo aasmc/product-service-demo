@@ -138,7 +138,7 @@ fun dimensAttributeCompositeValues(): List<AttributeDto> =
             attributeName = DIMENS_WIDTH_NAME,
             shortName = DIMENS_WIDTH_NAME,
             isFaceted = true,
-            availableValues = listOf(
+            availableValues = mutableListOf(
                 NumericAttributeValueDto(
                     numValue = DIMENS_WIDTH_VALUE_10,
                     numRuValue = null,
@@ -160,7 +160,7 @@ fun dimensAttributeCompositeValues(): List<AttributeDto> =
             attributeName = DIMENS_LENGTH_NAME,
             shortName = DIMENS_LENGTH_NAME,
             isFaceted = true,
-            availableValues = listOf(
+            availableValues = mutableListOf(
                 NumericAttributeValueDto(
                     numValue = DIMENS_LENGTH_VALUE_10,
                     numRuValue = null,
@@ -182,7 +182,7 @@ fun dimensAttributeCompositeValues(): List<AttributeDto> =
             attributeName = DIMENS_DEPTH_NAME,
             shortName = DIMENS_DEPTH_NAME,
             isFaceted = true,
-            availableValues = listOf(
+            availableValues = mutableListOf(
                 NumericAttributeValueDto(
                     numValue = DIMENS_DEPTH_VALUE_10,
                     numRuValue = null,
@@ -251,11 +251,11 @@ fun sizeAttributeDtoWithNoValues() = StringAttributeDto(
     attributeName = CLOTHES_SIZE_ATTR_NAME,
     shortName = CLOTHES_SIZE_ATTR_SHORT_NAME,
     isFaceted = true,
-    availableValues = listOf()
+    availableValues = mutableListOf()
 )
 
-fun sizeAttributeStringValues(): List<StringAttributeValueDto> =
-    listOf(
+fun sizeAttributeStringValues(): MutableList<StringAttributeValueDto> =
+    mutableListOf(
         StringAttributeValueDto(
             stringValue = SIZE_XS_VALUE,
             stringRuValue = SIZE_44_VALUE
@@ -331,7 +331,7 @@ fun colorAttributeRequest() = ColorAttributeDto(
     attributeName = COLOR_ATTR_NAME,
     shortName = COLOR_ATTR_NAME,
     isFaceted = true,
-    availableValues = listOf(
+    availableValues = mutableListOf(
         ColorAttributeValueDto(
             colorValue = BLUE,
             colorHex = BLUE_HEX
@@ -391,7 +391,7 @@ fun blueTShirtVariantDto(
     variantName = T_SHIRT_BLUE_VARIANT_NAME,
     price = BigDecimal.TEN,
     images = ImageCollection(
-        images = arrayListOf(
+        images = hashSetOf(
             AppImage(
                 url = "http://imageurl.com/blue-image-primary.png",
                 isPrimary = true
@@ -412,7 +412,7 @@ fun redTShirtVariantDto(
     variantName = T_SHIRT_RED_VARIANT_NAME,
     price = BigDecimal.TEN,
     images = ImageCollection(
-        images = arrayListOf(
+        images = hashSetOf(
             AppImage(
                 url = "http://imageurl.com/red-image-primary.png",
                 isPrimary = true
@@ -433,7 +433,7 @@ fun greenTShirtVariantDto(
     variantName = T_SHIRT_GREEN_VARIANT_NAME,
     price = BigDecimal.TEN,
     images = ImageCollection(
-        images = arrayListOf(
+        images = hashSetOf(
             AppImage(
                 url = "http://imageurl.com/green-image-primary.png",
                 isPrimary = true

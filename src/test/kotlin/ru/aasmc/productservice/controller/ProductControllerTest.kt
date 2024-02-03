@@ -63,35 +63,35 @@ class ProductControllerTest : BaseIntegTest() {
                 value.stringValue == SIZE_XS_VALUE ||
                         value.stringValue == SIZE_S_VALUE ||
                         value.stringValue == SIZE_M_VALUE
-            }
+            }.toMutableList()
 
         val redSizes = sizeAttr.availableValues
             .filter { value ->
                 value.stringValue == SIZE_M_VALUE ||
                         value.stringValue == SIZE_L_VALUE ||
                         value.stringValue == SIZE_XL_VALUE
-            }
+            }.toMutableList()
 
         val greenSizes = sizeAttr.availableValues
             .filter {value ->
                 value.stringValue == SIZE_S_VALUE ||
                         value.stringValue == SIZE_M_VALUE ||
                         value.stringValue == SIZE_L_VALUE
-            }
+            }.toMutableList()
 
         val blueAttributes = mutableListOf(
             sizeAttr.copy(availableValues = blueSizes),
-            colorAttr.copy(availableValues = listOf(blue))
+            colorAttr.copy(availableValues = mutableListOf(blue))
         )
 
         val redAttributes = mutableListOf(
             sizeAttr.copy(availableValues = redSizes),
-            colorAttr.copy(availableValues = listOf(red))
+            colorAttr.copy(availableValues = mutableListOf(red))
         )
 
         val greenAttributes = mutableListOf(
             sizeAttr.copy(availableValues = greenSizes),
-            colorAttr.copy(availableValues = listOf(green))
+            colorAttr.copy(availableValues = mutableListOf(green))
         )
 
         val blueSkuCollection = SkuCollection(

@@ -47,7 +47,8 @@ sealed class AttributeDto(
     open val isFaceted: Boolean,
     open val type: AttributeType,
     open val createdAt: LocalDateTime?,
-    open val isRequired: Boolean? = null
+    open val isRequired: Boolean? = null,
+    open val availableValues: List<AttributeValueDto>
 )
 
 data class StringAttributeDto(
@@ -61,8 +62,8 @@ data class StringAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val availableValues: List<StringAttributeValueDto>,
-) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+    override val availableValues: MutableList<StringAttributeValueDto>,
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, availableValues)
 
 data class NumericAttributeDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
@@ -75,8 +76,8 @@ data class NumericAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val availableValues: List<NumericAttributeValueDto>,
-) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+    override val availableValues: MutableList<NumericAttributeValueDto>,
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, availableValues)
 
 data class ColorAttributeDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
@@ -89,8 +90,8 @@ data class ColorAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val availableValues: List<ColorAttributeValueDto>,
-) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+    override val availableValues: MutableList<ColorAttributeValueDto>,
+) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, availableValues)
 
 data class CompositeAttributeDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
@@ -104,7 +105,7 @@ data class CompositeAttributeDto(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
     val subAttributes: List<AttributeDto>
-): AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired)
+): AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, listOf())
 
 enum class AttributeValueType(
     @field:JsonValue
