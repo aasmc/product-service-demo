@@ -2,8 +2,8 @@ CREATE TABLE sellers(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX sellers_updated_at_idx ON sellers(updated_at);
@@ -13,8 +13,8 @@ CREATE TABLE shops (
     seller_id BIGINT NOT NULL REFERENCES sellers(id),
     name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX shops_seller_id_idx ON shops(seller_id);
@@ -24,8 +24,8 @@ CREATE TABLE categories(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     parent_id BIGINT REFERENCES categories(id),
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX categories_parent_id_idx ON categories(parent_id);
@@ -64,8 +64,8 @@ CREATE TABLE products(
     category_id BIGINT REFERENCES categories(id),
     name TEXT NOT NULL,
     description TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX products_category_id_idx ON products(category_id);
@@ -77,16 +77,16 @@ CREATE TABLE product_variants (
     product_id BIGINT REFERENCES products(id) ON DELETE CASCADE,
     attributes JSONB,
     images JSONB,
-    skus JSONB,
+    sku_collection JSONB,
     price DECIMAL NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX product_variants_product_id_idx ON product_variants(product_id);
 CREATE INDEX product_variants_attributes_idx ON product_variants using GIN(attributes);
 CREATE INDEX product_variants_images_idx ON product_variants using GIN(images);
-CREATE INDEX product_variants_skus_idx ON product_variants using GIN(skus);
+CREATE INDEX product_variants_skus_idx ON product_variants using GIN(sku_collection);
 
 CREATE TABLE product_outbox (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

@@ -43,7 +43,7 @@ fun categoryAttributesToCreate(): List<AttributeDto> =
 fun sizeDimensionsColorsAttributes(): List<AttributeDto> = listOf(
     sizeAttributeDto(true),
     dimensionsAttributeDto(true),
-    colorAttributeRequest()
+    colorAttributeDto()
 )
 
 
@@ -327,7 +327,7 @@ fun createTshirtRequest(
     )
 )
 
-fun colorAttributeRequest() = ColorAttributeDto(
+fun colorAttributeDto() = ColorAttributeDto(
     attributeName = COLOR_ATTR_NAME,
     shortName = COLOR_ATTR_NAME,
     isFaceted = true,

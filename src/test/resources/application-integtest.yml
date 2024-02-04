@@ -8,3 +8,4 @@ spring:
 logging:
   level:
     ru.aasmc: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE

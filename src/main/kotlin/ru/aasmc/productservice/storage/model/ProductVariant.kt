@@ -26,7 +26,7 @@ class ProductVariant(
     @Column(columnDefinition = "jsonb", name = "images")
     var images: ImageCollection = ImageCollection(),
     @org.hibernate.annotations.Type(JsonBinaryType::class)
-    @Column(columnDefinition = "jsonb", name = "skus")
+    @Column(columnDefinition = "jsonb", name = "sku_collection")
     var skuCollection: SkuCollection,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
