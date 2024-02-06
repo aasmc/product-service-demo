@@ -52,8 +52,8 @@ class ProductOutboxServiceImpl(
         productId = productId,
         variantName = productVariant.variantName,
         price = productVariant.price,
-        attributes = productVariant.attributes,
-        images = productVariant.images,
+        attributes = productVariant.attributeCollection,
+        images = productVariant.imageCollection,
         skuCollection = productVariant.skuCollection
     )
 
@@ -75,8 +75,8 @@ class ProductOutboxServiceImpl(
             ProductEventVariant(
                 variantId = variant.id!!,
                 price = variant.price,
-                attributes = variant.attributes,
-                images = variant.images,
+                attributes = variant.attributeCollection,
+                images = variant.imageCollection,
                 createdAt = variant.createdAt!!,
                 updatedAt = variant.updatedAt!!,
                 skuCollection = variant.skuCollection

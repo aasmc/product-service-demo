@@ -27,6 +27,7 @@ const val BLUE_T_SHIRT_XS_SKU = "t-shirt/blue/XS/Brand/230"
 const val BLUE_T_SHIRT_S_SKU = "t-shirt/blue/S/Brand/231"
 const val BLUE_T_SHIRT_M_SKU = "t-shirt/blue/M/Brand/232"
 const val BLUE_T_SHIRT_VARIANT_NAME = "T-Shirt Blue"
+const val OLD_BLUE_IMAGE_URL = "http://images.com/old_blue_image.png"
 
 const val DIMENS_ATTR_NAME = "clothes dimensions"
 const val DIMENS_ATTR_SHORT_NAME = "dimensions"

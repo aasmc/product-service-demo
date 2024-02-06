@@ -3,7 +3,6 @@ package ru.aasmc.productservice.storage.model
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType
 import jakarta.persistence.*
 import ru.aasmc.productservice.dto.AttributeCollection
-import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.ImageCollection
 import ru.aasmc.productservice.dto.SkuCollection
 import java.math.BigDecimal
@@ -21,10 +20,10 @@ class ProductVariant(
     var price: BigDecimal,
     @org.hibernate.annotations.Type(JsonBinaryType::class)
     @Column(columnDefinition = "jsonb", name = "attributes")
-    var attributes: AttributeCollection = AttributeCollection(),
+    var attributeCollection: AttributeCollection = AttributeCollection(),
     @org.hibernate.annotations.Type(JsonBinaryType::class)
-    @Column(columnDefinition = "jsonb", name = "images")
-    var images: ImageCollection = ImageCollection(),
+    @Column(columnDefinition = "jsonb", name = "image_collection")
+    var imageCollection: ImageCollection = ImageCollection(),
     @org.hibernate.annotations.Type(JsonBinaryType::class)
     @Column(columnDefinition = "jsonb", name = "sku_collection")
     var skuCollection: SkuCollection,
@@ -32,7 +31,7 @@ class ProductVariant(
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
 
-) {
+    ) {
 
     @Column(name = "created_at")
     @org.hibernate.annotations.CreationTimestamp
@@ -42,7 +41,7 @@ class ProductVariant(
     var updatedAt: LocalDateTime? = null
 
     override fun toString(): String {
-        return "ProductVariant(id=$id, price=$price, attributes=$attributes, images=$images, skuCollection=$skuCollection)"
+        return "ProductVariant(id=$id, price=$price, attributes=$attributeCollection, images=$imageCollection, skuCollection=$skuCollection)"
     }
 
     override fun equals(other: Any?): Boolean {

@@ -44,8 +44,8 @@ class ProductMapper(
                 variantId = cryptoTool.hashOf(variant.id!!),
                 variantName = variant.variantName,
                 price = variant.price,
-                attributesCollection = variant.attributes,
-                images = variant.images,
+                attributesCollection = variant.attributeCollection,
+                images = variant.imageCollection,
                 createdAt = variant.createdAt!!,
                 skuCollection = variant.skuCollection
             )

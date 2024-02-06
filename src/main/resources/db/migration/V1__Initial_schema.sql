@@ -76,7 +76,7 @@ CREATE TABLE product_variants (
     variant_name TEXT NOT NULL,
     product_id BIGINT REFERENCES products(id) ON DELETE CASCADE,
     attributes JSONB,
-    images JSONB,
+    image_collection JSONB,
     sku_collection JSONB,
     price DECIMAL NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -85,7 +85,7 @@ CREATE TABLE product_variants (
 
 CREATE INDEX product_variants_product_id_idx ON product_variants(product_id);
 CREATE INDEX product_variants_attributes_idx ON product_variants using GIN(attributes);
-CREATE INDEX product_variants_images_idx ON product_variants using GIN(images);
+CREATE INDEX product_variants_images_idx ON product_variants using GIN(image_collection);
 CREATE INDEX product_variants_skus_idx ON product_variants using GIN(sku_collection);
 
 CREATE TABLE product_outbox (

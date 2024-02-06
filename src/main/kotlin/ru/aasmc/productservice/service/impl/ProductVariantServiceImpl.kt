@@ -79,7 +79,7 @@ class ProductVariantServiceImpl(
     override fun addVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        variant.images.images.add(photo)
+        variant.imageCollection.images.add(photo)
         log.info("Successfully added new photo {} to product variant with ID={}", photo, id)
         productVariantRepository.save(variant)
         return productVariantMapper.toProductVariantFullResponse(variant)
@@ -88,7 +88,7 @@ class ProductVariantServiceImpl(
     override fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val removed = variant.images.images.remove(photo)
+        val removed = variant.imageCollection.images.remove(photo)
         if (removed) {
             log.info("Successfully removed photo {} from product variant with ID={}", photo, variant.id)
         } else {
@@ -104,13 +104,13 @@ class ProductVariantServiceImpl(
     override fun addVariantAttribute(variantId: String, attribute: AttributeDto): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val existing = variant.attributes.attributes.firstOrNull { it.id == attribute.id }
+        val existing = variant.attributeCollection.attributes.firstOrNull { it.id == attribute.id }
         if (existing != null) {
             val msg = "Cannot add attribute with ID=${attribute.id} to product variant" +
                     " with ID=$variantId because it already has that attribute."
             throw ProductServiceException(msg, HttpStatus.BAD_REQUEST.value())
         }
-        variant.attributes.attributes.add(attribute)
+        variant.attributeCollection.attributes.add(attribute)
         productVariantRepository.save(variant)
         return productVariantMapper.toProductVariantFullResponse(variant)
     }
@@ -118,7 +118,7 @@ class ProductVariantServiceImpl(
     override fun removeVariantAttribute(variantId: String, attributeName: String): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val removed = variant.attributes.attributes
+        val removed = variant.attributeCollection.attributes
             .removeIf { it.attributeName == attributeName }
         if (removed) {
             log.info(
@@ -142,7 +142,7 @@ class ProductVariantServiceImpl(
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val added = variant.attributes.attributes
+        val added = variant.attributeCollection.attributes
             .firstOrNull { it.attributeName == attributeName }
             ?.let { attribute ->
                 when (attribute) {
@@ -179,7 +179,7 @@ class ProductVariantServiceImpl(
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val removed = variant.attributes.attributes
+        val removed = variant.attributeCollection.attributes
             .firstOrNull { it.attributeName == attributeName }
             ?.let { attribute ->
                 when (attribute) {
