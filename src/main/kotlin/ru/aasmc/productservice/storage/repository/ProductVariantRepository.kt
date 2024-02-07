@@ -21,7 +21,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         SET attribute_collection = jsonb_set(
             attribute_collection,
             attr_path.path,
-            (attribute_collection->'attributes'->attr_path.idx->'availableValues')\:\:jsonb 
+            attribute_collection->'attributes'->attr_path.idx->'availableValues'
            || (:valueStr)\:\:jsonb
         )
         FROM attr_path

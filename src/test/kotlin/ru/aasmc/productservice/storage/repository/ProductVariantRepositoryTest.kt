@@ -28,7 +28,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
             colorHex = BLUE_HEX
         )
         val valueStr = om.writeValueAsString(blueColorAttrValue)
-        productVariantRepository.addAttributeValue(1, COLOR_ATTR_ID, valueStr)
+        productVariantRepository.addAttributeValue(1, COLOR_ATTR_NAME, valueStr)
 
         val variant = productVariantRepository
             .findById(1)
