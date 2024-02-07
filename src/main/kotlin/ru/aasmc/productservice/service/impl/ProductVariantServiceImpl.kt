@@ -151,6 +151,7 @@ class ProductVariantServiceImpl(
                     }
 
                     is CompositeAttributeDto -> {
+                        // TODO
                         // we don't add values directly to composite attributes
                         false
                     }
@@ -188,6 +189,7 @@ class ProductVariantServiceImpl(
                     }
 
                     is CompositeAttributeDto -> {
+                        // TODO
                         false
                     }
 

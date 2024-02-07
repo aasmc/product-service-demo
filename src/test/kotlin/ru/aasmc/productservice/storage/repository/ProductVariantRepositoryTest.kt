@@ -17,7 +17,76 @@ import java.math.BigDecimal
 class ProductVariantRepositoryTest @Autowired constructor(
     private val productVariantRepository: ProductVariantRepository,
     private val om: ObjectMapper
-): BaseJpaTest() {
+) : BaseJpaTest() {
+
+    @Test
+    fun addCompositeAttributeValue_addsValue() {
+        val width40 = NumericAttributeValueDto(
+            numValue = 40.0,
+            numRuValue = null,
+            numUnit = "mm"
+        )
+        val widthStr = om.writeValueAsString(width40)
+        productVariantRepository.addCompositeAttributeValue(
+            1,
+            DIMENS_ATTR_NAME,
+            DIMENS_WIDTH_NAME,
+            widthStr
+        )
+        val dimens = productVariantRepository.findById(1).get()
+            .attributeCollection.attributes
+            .first { it.attributeName == DIMENS_ATTR_NAME } as CompositeAttributeDto
+        val newValues = dimens.subAttributes.first { it.attributeName == DIMENS_WIDTH_NAME }
+            .availableValues
+        assertThat(newValues).hasSize(4)
+        val nums = newValues.map { (it as NumericAttributeValueDto).numValue }
+        assertThat(nums).contains(width40.numValue)
+    }
+
+    @Test
+    fun removeCompositeNumericAttributeValue_removesValue() {
+        productVariantRepository.removeCompositeAttributeNumericValue(
+            1,
+            DIMENS_ATTR_NAME,
+            DIMENS_WIDTH_NAME,
+            DIMENS_WIDTH_VALUE_10
+        )
+
+        val dimens = productVariantRepository.findById(1).get().attributeCollection
+            .attributes.first { it.attributeName ==  DIMENS_ATTR_NAME} as CompositeAttributeDto
+        val widthValues = dimens.subAttributes
+            .first { it.attributeName ==  DIMENS_WIDTH_NAME}.availableValues
+
+        assertThat(widthValues).hasSize(2)
+        val numericWidthValues = widthValues.map { (it as NumericAttributeValueDto).numValue }
+        assertThat(numericWidthValues).doesNotContain(DIMENS_WIDTH_VALUE_10)
+    }
+
+    @Test
+    fun removeNumericAttributeValue_removesValue() {
+        productVariantRepository.removeNumericAttributeValue(1, WEIGHT_ATTR_NAME, WEIGHT_VALUE_100)
+        val attrValues = productVariantRepository.findById(1).get()
+            .attributeCollection.attributes
+            .first { it.attributeName == WEIGHT_ATTR_NAME }
+            .availableValues
+        assertThat(attrValues).hasSize(1)
+        val numValues = attrValues.map { (it as NumericAttributeValueDto).numValue }
+        assertThat(numValues).doesNotContain(WEIGHT_VALUE_100)
+    }
+
+    @Test
+    fun removeStringAttributeValue_removesValue() {
+        // given variant with size attribute with 6 values
+        // when removing one value
+        productVariantRepository.removeStringAttributeValue(1, CLOTHES_SIZE_ATTR_NAME, SIZE_XS_VALUE, SIZE_44_VALUE)
+        // then variant has only 1 value
+        val attrValues = productVariantRepository.findById(1).get().attributeCollection.attributes
+            .first { it.attributeName == CLOTHES_SIZE_ATTR_NAME }
+            .availableValues
+        assertThat(attrValues).hasSize(5)
+        val stringValues = attrValues.map { (it as StringAttributeValueDto).stringValue }
+        assertThat(stringValues).doesNotContain(SIZE_XS_VALUE)
+    }
 
     @Test
     fun removeColorAttributeValue_removesValue() {
@@ -59,7 +128,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
         productVariantRepository.removeVariantAttribute(1, COLOR_ATTR_NAME)
         val attributes = productVariantRepository.findById(1)
             .get().attributeCollection.attributes
-        assertThat(attributes).isEmpty()
+        assertThat(attributes).hasSize(3) // size + weight + dimens
     }
 
     @Test
@@ -82,7 +151,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
 
         val attributes = productVariantRepository.findById(1)
             .get().attributeCollection.attributes
-        assertThat(attributes).hasSize(2)
+        assertThat(attributes).hasSize(4) // size + weight + dimens + color
         assertThat(attributes).contains(sizeAttr)
     }
 
@@ -106,7 +175,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
 
         val attributes = productVariantRepository.findById(1)
             .get().attributeCollection.attributes
-        assertThat(attributes).hasSize(1)
+        assertThat(attributes).hasSize(4) // color + size + weight + dimens
         assertThat(attributes).contains(colorAttr)
     }
 

@@ -132,6 +132,27 @@ fun dimensAttributeDomain(): CompositeAttribute {
     return attr
 }
 
+fun numericAttributeDto(id: String? = null): NumericAttributeDto =
+    NumericAttributeDto(
+        id = id,
+        attributeName = WEIGHT_ATTR_NAME,
+        shortName = WEIGHT_ATTR_NAME,
+        isFaceted = true,
+        isRequired = true,
+        availableValues = mutableListOf(
+            NumericAttributeValueDto(
+                numValue = WEIGHT_VALUE_100,
+                numRuValue = WEIGHT_RU_VALUE_100,
+                numUnit = WEIGHT_UNIT
+            ),
+            NumericAttributeValueDto(
+                numValue = WEIGHT_VALUE_200,
+                numRuValue = WEIGHT_RU_VALUE_200,
+                numUnit = WEIGHT_UNIT
+            ),
+        )
+    )
+
 fun dimensAttributeCompositeValues(): List<AttributeDto> =
     listOf(
         NumericAttributeDto(

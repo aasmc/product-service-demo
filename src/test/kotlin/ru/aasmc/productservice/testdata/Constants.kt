@@ -65,4 +65,15 @@ const val GREEN = "green"
 
 const val COLOR_ATTR_NAME = "color"
 const val COLOR_ATTR_ID = "colorAttrId"
+const val STRING_ATTR_ID = "stringAttrId"
+
+const val WEIGHT_ATTR_NAME = "weight"
+const val WEIGHT_ATTR_ID = "weightId"
+const val WEIGHT_VALUE_100 = 100.0
+const val WEIGHT_RU_VALUE_100 = 100.0
+const val WEIGHT_UNIT = "gram"
+const val WEIGHT_VALUE_200 = 200.0
+const val WEIGHT_RU_VALUE_200 = 200.0
+
+const val DIMENS_ATTR_ID = "dimensId"
 
