@@ -7,18 +7,72 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.jdbc.Sql
 import ru.aasmc.productservice.BaseJpaTest
 import ru.aasmc.productservice.dto.AppImage
-import ru.aasmc.productservice.testdata.BLUE_T_SHIRT_XS_SKU
-import ru.aasmc.productservice.testdata.OLD_BLUE_IMAGE_URL
+import ru.aasmc.productservice.dto.ColorAttributeDto
+import ru.aasmc.productservice.dto.ColorAttributeValueDto
+import ru.aasmc.productservice.testdata.*
 import java.math.BigDecimal
 
 @Sql(
     scripts = ["classpath:insert_product.sql"],
-    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS
 )
 class ProductVariantRepositoryTest @Autowired constructor(
     private val productVariantRepository: ProductVariantRepository,
     private val om: ObjectMapper
 ): BaseJpaTest() {
+
+    @Test
+    fun addAttributeValue_addsValueToAttribute() {
+        val blueColorAttrValue = ColorAttributeValueDto(
+            colorValue = BLUE,
+            colorHex = BLUE_HEX
+        )
+        val valueStr = om.writeValueAsString(blueColorAttrValue)
+        productVariantRepository.addAttributeValue(1, COLOR_ATTR_ID, valueStr)
+
+        val variant = productVariantRepository
+            .findById(1)
+            .get()
+
+        val availableValues = variant.attributeCollection.attributes
+            .first { it.attributeName == COLOR_ATTR_NAME }
+            .availableValues
+
+        assertThat(availableValues).hasSize(2)
+        assertThat(availableValues).contains(blueColorAttrValue)
+    }
+
+    @Test
+    fun removeVariantAttribute_removesVariantAttribute() {
+        productVariantRepository.removeVariantAttribute(1, COLOR_ATTR_NAME)
+        val attributes = productVariantRepository.findById(1)
+            .get().attributeCollection.attributes
+        assertThat(attributes).isEmpty()
+    }
+
+    @Test
+    fun addVariantAttribute_addsVariantAttribute() {
+        val blueColorAttrValue = ColorAttributeValueDto(
+            colorValue = BLUE,
+            colorHex = BLUE_HEX
+        )
+        val colorAttrId = "colorAttrId"
+        val colorAttr = ColorAttributeDto(
+            id = colorAttrId,
+            attributeName = COLOR_ATTR_NAME,
+            shortName = COLOR_ATTR_NAME,
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(blueColorAttrValue)
+        )
+        val colorAttrStr = om.writeValueAsString(colorAttr)
+        productVariantRepository.addVariantAttribute(1, colorAttrStr, COLOR_ATTR_NAME)
+
+        val attributes = productVariantRepository.findById(1)
+            .get().attributeCollection.attributes
+        assertThat(attributes).hasSize(2)
+        assertThat(attributes).contains(colorAttr)
+    }
 
     @Test
     fun removeImage_removesImage() {
@@ -31,10 +85,9 @@ class ProductVariantRepositoryTest @Autowired constructor(
     fun addImage_addsImage() {
         val newImage = AppImage(
             url = "http://images.com/new_image.png",
-            isPrimary = true
+            isPrimary = false
         )
         val newImageStr = om.writeValueAsString(newImage)
-        println(newImageStr)
         productVariantRepository.addImage(1, newImageStr)
         val updated = productVariantRepository.findById(1).get()
         assertThat(updated.imageCollection.images).hasSize(2)

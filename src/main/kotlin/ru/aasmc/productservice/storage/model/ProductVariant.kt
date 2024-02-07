@@ -19,7 +19,7 @@ class ProductVariant(
     @Column(nullable = false)
     var price: BigDecimal,
     @org.hibernate.annotations.Type(JsonBinaryType::class)
-    @Column(columnDefinition = "jsonb", name = "attributes")
+    @Column(columnDefinition = "jsonb", name = "attribute_collection")
     var attributeCollection: AttributeCollection = AttributeCollection(),
     @org.hibernate.annotations.Type(JsonBinaryType::class)
     @Column(columnDefinition = "jsonb", name = "image_collection")

@@ -75,7 +75,7 @@ CREATE TABLE product_variants (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     variant_name TEXT NOT NULL,
     product_id BIGINT REFERENCES products(id) ON DELETE CASCADE,
-    attributes JSONB,
+    attribute_collection JSONB,
     image_collection JSONB,
     sku_collection JSONB,
     price DECIMAL NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE product_variants (
 );
 
 CREATE INDEX product_variants_product_id_idx ON product_variants(product_id);
-CREATE INDEX product_variants_attributes_idx ON product_variants using GIN(attributes);
+CREATE INDEX product_variants_attributes_idx ON product_variants using GIN(attribute_collection);
 CREATE INDEX product_variants_images_idx ON product_variants using GIN(image_collection);
 CREATE INDEX product_variants_skus_idx ON product_variants using GIN(sku_collection);
 

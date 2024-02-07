@@ -2,8 +2,12 @@ insert into categories(name) values('Clothes');
 insert into sellers(first_name, last_name) values('Seller', 'LastName') ;
 insert into shops(seller_id, name, description) values (1, 'Shop', 'Shop Description');
 insert into products(shop_id, category_id, name, description) values (1, 1,'T-Shirt', 'T-Shirt description');
-insert into product_variants(variant_name, product_id, attributes, image_collection, sku_collection, price)
-values ('T-Shirt Blue', 1, '{"attributes":[]}',
+insert into product_variants(variant_name, product_id, attribute_collection, image_collection, sku_collection, price)
+values ('T-Shirt Blue', 1,
+        '{"attributes":[
+                           {"id":"colorAttrId","attributeName":"color","shortName":"color","isFaceted":true,"type":"color","isRequired":true,"availableValues":[{"colorValue":"red","colorHex":"FF0000","type":"color_type"}]}
+                        ]
+        }',
         '{"images":
             [
                 {"url":"http://images.com/old_blue_image.png","isPrimary":true}

@@ -64,4 +64,5 @@ const val BLUE = "blue"
 const val GREEN = "green"
 
 const val COLOR_ATTR_NAME = "color"
+const val COLOR_ATTR_ID = "colorAttrId"
 

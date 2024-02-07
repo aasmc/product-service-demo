@@ -15,7 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(
     scripts = ["classpath:clear-db.sql"],
-    executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+    executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS
 )
 open class BaseJpaTest {
 }
