@@ -21,6 +21,101 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         SET attribute_collection = jsonb_set(
             attribute_collection,
             attr_path.path,
+            COALESCE(
+                     (SELECT jsonb_agg(elem)
+                         FROM jsonb_array_elements(attribute_collection->'attributes'->attr_path.idx->'availableValues') elem
+                         WHERE elem->>'numValue' != :numValue
+                         AND elem->>'numRuValue' != :numRuValue
+                         AND elem->>'numUnit' != :numUnit
+                     ),
+                     '[]'\:\:jsonb
+                 )
+        )
+        FROM attr_path
+        WHERE id = :variantId
+    """, nativeQuery = true)
+    fun removeNumericAttributeValue(
+        @Param("variantId") variantId: Long,
+        @Param("attrName") attrName: String,
+        @Param("numValue") numValue: Double,
+        @Param("numRuValue") numRuValue: Double?,
+        @Param("numUnit") numUnit: String
+    )
+
+    @Modifying
+    @Query("""
+        WITH attr_path AS (
+            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
+            CAST((index - 1) AS INTEGER) AS idx 
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :attrName
+        )
+        UPDATE product_variants
+        SET attribute_collection = jsonb_set(
+            attribute_collection,
+            attr_path.path,
+            COALESCE(
+                     (SELECT jsonb_agg(elem)
+                         FROM jsonb_array_elements(attribute_collection->'attributes'->attr_path.idx->'availableValues') elem
+                         WHERE elem->>'stringValue' != :stringValue
+                         AND elem->>'stringRuValue' != :stringRuValue
+                     ),
+                     '[]'\:\:jsonb
+                 )
+        )
+        FROM attr_path
+        WHERE id = :variantId
+    """, nativeQuery = true)
+    fun removeStringAttributeValue(
+        @Param("variantId") variantId: Long,
+        @Param("attrName") attrName: String,
+        @Param("stringValue") stringValue: String,
+        @Param("stringRuValue") stringRuValue: String
+    )
+
+    @Modifying
+    @Query("""
+        WITH attr_path AS (
+            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
+            CAST((index - 1) AS INTEGER) AS idx 
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :attrName
+        )
+        UPDATE product_variants
+        SET attribute_collection = jsonb_set(
+            attribute_collection,
+            attr_path.path,
+            COALESCE(
+                     (SELECT jsonb_agg(elem)
+                         FROM jsonb_array_elements(attribute_collection->'attributes'->attr_path.idx->'availableValues') elem
+                         WHERE elem->>'colorValue' != :colorValue
+                         AND elem->>'colorHex' != :colorHex
+                     ),
+                     '[]'\:\:jsonb
+                 )
+        )
+        FROM attr_path
+        WHERE id = :variantId
+    """, nativeQuery = true)
+    fun removeColorAttributeValue(
+        @Param("variantId") variantId: Long,
+        @Param("attrName") attrName: String,
+        @Param("colorValue") colorValue: String,
+        @Param("colorHex") colorHex: String
+    )
+
+    @Modifying
+    @Query("""
+        WITH attr_path AS (
+            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
+            CAST((index - 1) AS INTEGER) AS idx 
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :attrName
+        )
+        UPDATE product_variants
+        SET attribute_collection = jsonb_set(
+            attribute_collection,
+            attr_path.path,
             attribute_collection->'attributes'->attr_path.idx->'availableValues'
            || (:valueStr)\:\:jsonb
         )
@@ -74,7 +169,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         WHERE id = :variantId
     """, nativeQuery = true
     )
-    fun addVariantAttribute(
+    fun addOrReplaceVariantAttribute(
         @Param("variantId") variantId: Long,
         @Param("attrStr") attrString: String,
         @Param("attrName") attrName: String

@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.jdbc.Sql
 import ru.aasmc.productservice.BaseJpaTest
-import ru.aasmc.productservice.dto.AppImage
-import ru.aasmc.productservice.dto.ColorAttributeDto
-import ru.aasmc.productservice.dto.ColorAttributeValueDto
+import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.testdata.*
 import java.math.BigDecimal
 
@@ -20,6 +18,20 @@ class ProductVariantRepositoryTest @Autowired constructor(
     private val productVariantRepository: ProductVariantRepository,
     private val om: ObjectMapper
 ): BaseJpaTest() {
+
+    @Test
+    fun removeColorAttributeValue_removesValue() {
+        productVariantRepository.removeColorAttributeValue(1, COLOR_ATTR_NAME, RED, RED_HEX)
+        val variant = productVariantRepository
+            .findById(1)
+            .get()
+
+        val availableValues = variant.attributeCollection.attributes
+            .first { it.attributeName == COLOR_ATTR_NAME }
+            .availableValues
+
+        assertThat(availableValues).isEmpty()
+    }
 
     @Test
     fun addAttributeValue_addsValueToAttribute() {
@@ -51,7 +63,31 @@ class ProductVariantRepositoryTest @Autowired constructor(
     }
 
     @Test
-    fun addVariantAttribute_addsVariantAttribute() {
+    fun addOrReplaceVariantAttribute_addsVariantAttributeWithDifferentName() {
+        val xsValue = StringAttributeValueDto(
+            stringRuValue = "44",
+            stringValue = "XS"
+        )
+        val sizeAttrId = "sizeAttrId"
+        val sizeAttr = StringAttributeDto(
+            id = sizeAttrId,
+            attributeName = CLOTHES_SIZE_ATTR_NAME,
+            shortName = CLOTHES_SIZE_ATTR_SHORT_NAME,
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(xsValue)
+        )
+        val sizeStr = om.writeValueAsString(sizeAttr)
+        productVariantRepository.addOrReplaceVariantAttribute(1, sizeStr, CLOTHES_SIZE_ATTR_NAME)
+
+        val attributes = productVariantRepository.findById(1)
+            .get().attributeCollection.attributes
+        assertThat(attributes).hasSize(2)
+        assertThat(attributes).contains(sizeAttr)
+    }
+
+    @Test
+    fun addOrReplaceVariantAttribute_replacesVariantAttributeWithSameName() {
         val blueColorAttrValue = ColorAttributeValueDto(
             colorValue = BLUE,
             colorHex = BLUE_HEX
@@ -66,11 +102,11 @@ class ProductVariantRepositoryTest @Autowired constructor(
             availableValues = mutableListOf(blueColorAttrValue)
         )
         val colorAttrStr = om.writeValueAsString(colorAttr)
-        productVariantRepository.addVariantAttribute(1, colorAttrStr, COLOR_ATTR_NAME)
+        productVariantRepository.addOrReplaceVariantAttribute(1, colorAttrStr, COLOR_ATTR_NAME)
 
         val attributes = productVariantRepository.findById(1)
             .get().attributeCollection.attributes
-        assertThat(attributes).hasSize(2)
+        assertThat(attributes).hasSize(1)
         assertThat(attributes).contains(colorAttr)
     }
 
