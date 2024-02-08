@@ -33,6 +33,9 @@ class JsonbOpsProductVariantServiceImpl(
             variantId = variantId,
             newStock = dto.newStock
         )
+        updateOutboxService.saveUpdateSkuStockEvent(
+            variantId, dto.sku, dto.newStock
+        )
         log.info("Successfully updated Sku stock: {}", dto)
         return UpdateSkuStockResponse(
             sku = dto.sku,
@@ -48,6 +51,7 @@ class JsonbOpsProductVariantServiceImpl(
             variantId = variantId,
             newPrice = dto.newPrice
         )
+        updateOutboxService.saveUpdateSkuPriceEvent(variantId, dto.sku, dto.newPrice)
         log.info("Successfully updated Sku price: {}", dto)
         return UpdateSkuPriceResponse(
             sku = dto.sku,
@@ -86,19 +90,21 @@ class JsonbOpsProductVariantServiceImpl(
         checkVariantExists(id, variantId)
         productVariantRepository.addImage(id, om.writeValueAsString(photo))
         log.info("Successfully added new photo {} to product variant with ID={}", photo, id)
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVPhotosEvent(
+            id, updated.imageCollection
         )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         checkVariantExists(id, variantId)
         productVariantRepository.removeImage(id, photo.url)
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVPhotosEvent(id, updated.imageCollection)
         log.info("Successfully removed photo {} from product variant with ID={}", photo, id)
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun addVariantAttribute(variantId: String, attribute: AttributeDto): ProductVariantResponse {
@@ -109,13 +115,13 @@ class JsonbOpsProductVariantServiceImpl(
             attrString = om.writeValueAsString(attribute),
             attrName = attribute.attributeName
         )
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
             "Successfully added attribute: {} to product variant with ID={}",
             attribute, id
         )
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun removeVariantAttribute(variantId: String, attributeName: String): ProductVariantResponse {
@@ -125,13 +131,13 @@ class JsonbOpsProductVariantServiceImpl(
             variantId = id,
             attrName = attributeName
         )
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
             "Successfully removed attribute with name={} from Product Variant with ID={}",
             attributeName, id
         )
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun addValueToCompositeAttribute(
@@ -148,13 +154,13 @@ class JsonbOpsProductVariantServiceImpl(
             subAttrName = subAttributeName,
             valueString = om.writeValueAsString(value)
         )
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
             "Successfully added value: {} to composite attribute with name: {} of product variant with ID={}",
             value, attributeName, id
         )
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun addAttributeValue(
@@ -169,13 +175,13 @@ class JsonbOpsProductVariantServiceImpl(
             attributeName,
             om.writeValueAsString(value)
         )
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
             "Successfully added value: {} to attribute with name: {} of product variant with ID={}",
             value, attributeName, id
         )
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun removeAttributeValue(
@@ -211,13 +217,13 @@ class JsonbOpsProductVariantServiceImpl(
                 )
             }
         }
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
             "Successfully removed value: {} from attribute with name: {} of product variant with ID={}",
             value, attributeName, id
         )
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     override fun removeValueFromCompositeAttribute(
@@ -256,13 +262,13 @@ class JsonbOpsProductVariantServiceImpl(
                 )
             }
         }
+        val updated = getProductVariantOrThrow(variantId, id)
+        updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
             "Successfully removed value: {} from composite attribute with name:{}, subattribut name: {} of product variant with ID={}",
             value, attributeName, subAttributeName, id
         )
-        return productVariantMapper.toProductVariantFullResponse(
-            getProductVariantOrThrow(variantId, id)
-        )
+        return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
     private fun updateProductVariant(
