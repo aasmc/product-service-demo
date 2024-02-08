@@ -20,6 +20,13 @@ interface ProductVariantService {
 
     fun removeVariantAttribute(variantId: String, attributeName: String): ProductVariantResponse
 
+    fun addValueToCompositeAttribute(
+        variantId: String,
+        attributeName: String,
+        subAttributeName: String,
+        value: AttributeValueDto
+    ): ProductVariantResponse
+
     fun addAttributeValue(
         variantId: String,
         attributeName: String,
@@ -29,6 +36,13 @@ interface ProductVariantService {
     fun removeAttributeValue(
         variantId: String,
         attributeName: String,
+        value: AttributeValueDto
+    ): ProductVariantResponse
+
+    fun removeValueFromCompositeAttribute(
+        variantId: String,
+        attributeName: String,
+        subAttributeName: String,
         value: AttributeValueDto
     ): ProductVariantResponse
 

@@ -90,7 +90,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
     fun removeStringAttributeValue_removesValue() {
         // given variant with size attribute with 6 values
         // when removing one value
-        productVariantRepository.removeStringAttributeValue(1, CLOTHES_SIZE_ATTR_NAME, SIZE_XS_VALUE, SIZE_44_VALUE)
+        productVariantRepository.removeStringAttributeValue(1, CLOTHES_SIZE_ATTR_NAME, SIZE_XS_VALUE)
         // then variant has only 1 value
         val attrValues = productVariantRepository.findById(1).get().attributeCollection.attributes
             .first { it.attributeName == CLOTHES_SIZE_ATTR_NAME }

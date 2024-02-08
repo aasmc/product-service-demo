@@ -9,6 +9,11 @@ import java.math.BigDecimal
 
 interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
 
+
+
+    @Query("select pv.id from ProductVariant pv where pv.id = :variantId")
+    fun getIdIfPresent(@Param("variantId") variantId: Long): Long?
+
     @Modifying
     @Query("""
         WITH attr_path AS (
@@ -163,7 +168,6 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
                      (SELECT jsonb_agg(elem)
                          FROM jsonb_array_elements(attribute_collection->'attributes'->attr_path.idx->'availableValues') elem
                          WHERE elem->>'stringValue' != :stringValue
-                         AND elem->>'stringRuValue' != :stringRuValue
                      ),
                      '[]'\:\:jsonb
                  )
@@ -175,7 +179,6 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("variantId") variantId: Long,
         @Param("attrName") attrName: String,
         @Param("stringValue") stringValue: String,
-        @Param("stringRuValue") stringRuValue: String
     )
 
     @Modifying

@@ -2,6 +2,7 @@ package ru.aasmc.productservice.service.impl
 
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import ru.aasmc.productservice.dto.*
@@ -15,7 +16,7 @@ import ru.aasmc.productservice.utils.CryptoTool
 
 @Service
 @Transactional
-class ProductVariantServiceImpl(
+class InAppProductVariantServiceImpl(
     private val updateOutboxService: UpdateOutboxService,
     private val productVariantRepository: ProductVariantRepository,
     private val cryptoTool: CryptoTool,
@@ -135,6 +136,15 @@ class ProductVariantServiceImpl(
         return productVariantMapper.toProductVariantFullResponse(variant)
     }
 
+    override fun addValueToCompositeAttribute(
+        variantId: String,
+        attributeName: String,
+        subAttributeName: String,
+        value: AttributeValueDto
+    ): ProductVariantResponse {
+        TODO("Not yet implemented")
+    }
+
     override fun addAttributeValue(
         variantId: String,
         attributeName: String,
@@ -151,7 +161,6 @@ class ProductVariantServiceImpl(
                     }
 
                     is CompositeAttributeDto -> {
-                        // TODO
                         // we don't add values directly to composite attributes
                         false
                     }
@@ -189,7 +198,6 @@ class ProductVariantServiceImpl(
                     }
 
                     is CompositeAttributeDto -> {
-                        // TODO
                         false
                     }
 
@@ -208,6 +216,15 @@ class ProductVariantServiceImpl(
             log.info("Successfully removed value: {} from attribute with name: {}", value, attributeName)
         }
         return productVariantMapper.toProductVariantFullResponse(variant)
+    }
+
+    override fun removeValueFromCompositeAttribute(
+        variantId: String,
+        attributeName: String,
+        subAttributeName: String,
+        value: AttributeValueDto
+    ): ProductVariantResponse {
+        TODO("Not yet implemented")
     }
 
     private fun getProductVariantOrThrow(idStr: String, id: Long): ProductVariant {
@@ -302,6 +319,6 @@ class ProductVariantServiceImpl(
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger(ProductVariantServiceImpl::class.java)
+        private val log = LoggerFactory.getLogger(InAppProductVariantServiceImpl::class.java)
     }
 }
