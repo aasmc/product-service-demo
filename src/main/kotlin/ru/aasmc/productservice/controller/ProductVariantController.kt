@@ -102,6 +102,20 @@ class ProductVariantController(
         return productVariantService.addAttributeValue(variantId, attributeName, value)
     }
 
+    @PatchMapping("/{id}/composite-attribute-value")
+    fun addCompositeAttributeValue(
+        @PathVariable("id") variantId: String,
+        @RequestBody value: AttributeValueDto,
+        @RequestParam("attributeName") attributeName: String,
+        @RequestParam("subAttributeName") subAttributeName: String,
+    ): ProductVariantResponse {
+        log.info(
+            "Received PATCH request to add value: {} to composite attribute with name={}, of product variant with ID={}",
+            value, attributeName, variantId
+        )
+        return productVariantService.addValueToCompositeAttribute(variantId, attributeName, subAttributeName, value)
+    }
+
     @DeleteMapping("/{id}/attribute-value")
     fun deleteAttributeValue(
         @PathVariable("id") variantId: String,
@@ -113,6 +127,20 @@ class ProductVariantController(
             value, attributeName, variantId
         )
         return productVariantService.removeAttributeValue(variantId, attributeName, value)
+    }
+
+    @DeleteMapping("/{id}/composite-attribute-value")
+    fun deleteCompositeAttributeValue(
+        @PathVariable("id") variantId: String,
+        @RequestBody value: AttributeValueDto,
+        @RequestParam("attributeName") attributeName: String,
+        @RequestParam("subAttributeName") subAttributeName: String,
+    ): ProductVariantResponse {
+        log.info(
+            "Received request to DELETE value: {} from composite attribute with name={} of product variant with ID={}",
+            value, attributeName, variantId
+        )
+        return productVariantService.removeValueFromCompositeAttribute(variantId, attributeName, subAttributeName, value)
     }
 
     companion object {
