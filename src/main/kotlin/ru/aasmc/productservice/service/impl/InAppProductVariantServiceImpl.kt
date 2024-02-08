@@ -143,19 +143,7 @@ class InAppProductVariantServiceImpl(
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val added = variant.attributeCollection.attributes
-            .firstOrNull { it.attributeName == attributeName }
-            ?.let { attrDto ->
-                val composite = attrDto as? CompositeAttributeDto ?: throw ProductServiceException(
-                    "Cannot add value to attribute, because the attribute $attributeName is not composite",
-                    HttpStatus.BAD_REQUEST.value()
-                )
-                composite.subAttributes
-                    .firstOrNull { it.attributeName == subAttributeName }
-                    ?.let { subAttr ->
-                        addOrRemoveValueToAttribute(subAttr, value, subAttributeName)
-                    }
-            }
+        val added = updateCompositeAttributeValue(variant, attributeName, subAttributeName, value)
         if (added == null || !added) {
             log.info("Failed to add value: {} to composite attribute with name: {}", value, attributeName)
         } else {
@@ -171,11 +159,7 @@ class InAppProductVariantServiceImpl(
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val added = variant.attributeCollection.attributes
-            .firstOrNull { it.attributeName == attributeName }
-            ?.let { attribute ->
-                addOrRemoveValueToAttribute(attribute, value, attributeName)
-            }
+        val added = updateAttributeValue(variant, attributeName, value)
         if (added == null || !added) {
             log.info("Failed to add value: {} to attribute with name: {}", value, attributeName)
         } else {
@@ -191,27 +175,7 @@ class InAppProductVariantServiceImpl(
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val removed = variant.attributeCollection.attributes
-            .firstOrNull { it.attributeName == attributeName }
-            ?.let { attribute ->
-                when (attribute) {
-                    is ColorAttributeDto -> {
-                        addOrRemoveColorAttributeValue(value, attributeName, attribute, true)
-                    }
-
-                    is CompositeAttributeDto -> {
-                        false
-                    }
-
-                    is NumericAttributeDto -> {
-                        addOrRemoveNumericAttributeValue(value, attributeName, attribute, true)
-                    }
-
-                    is StringAttributeDto -> {
-                        addOrRemoveStringAttributeValue(value, attributeName, attribute, true)
-                    }
-                }
-            }
+        val removed = updateAttributeValue(variant, attributeName, value, true)
         if (removed == null || !removed) {
             log.info("Failed to remove value: {} from attribute with name: {}", value, attributeName)
         } else {
@@ -228,25 +192,48 @@ class InAppProductVariantServiceImpl(
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val removed = variant.attributeCollection.attributes
-            .firstOrNull { it.attributeName == attributeName }
-            ?.let { attrDto ->
-                val composite = attrDto as? CompositeAttributeDto ?: throw ProductServiceException(
-                    "Cannot remove value from attribute, because the attribute $attributeName is not composite",
-                    HttpStatus.BAD_REQUEST.value()
-                )
-                composite.subAttributes
-                    .firstOrNull { it.attributeName == subAttributeName }
-                    ?.let { subAttr ->
-                        addOrRemoveValueToAttribute(subAttr, value, subAttributeName, true)
-                    }
-            }
+        val removed = updateCompositeAttributeValue(variant, attributeName, subAttributeName, value, true)
         if (removed == null || !removed) {
             log.info("Failed to remove value: {} from composite attribute with name: {}", value, attributeName)
         } else {
             log.info("Successfully removed value: {} from composite attribute with name: {}", value, attributeName)
         }
         return productVariantMapper.toProductVariantFullResponse(variant)
+    }
+
+    private fun updateCompositeAttributeValue(
+        variant: ProductVariant,
+        attributeName: String,
+        subAttributeName: String,
+        value: AttributeValueDto,
+        remove: Boolean = false
+    ): Boolean? {
+        return variant.attributeCollection.attributes
+            .firstOrNull { it.attributeName == attributeName }
+            ?.let { attrDto ->
+                val composite = attrDto as? CompositeAttributeDto ?: throw ProductServiceException(
+                    "Cannot add/remove value to/from attribute, because the attribute $attributeName is not composite",
+                    HttpStatus.BAD_REQUEST.value()
+                )
+                composite.subAttributes
+                    .firstOrNull { it.attributeName == subAttributeName }
+                    ?.let { subAttr ->
+                        addOrRemoveValueToAttribute(subAttr, value, subAttributeName, remove)
+                    }
+            }
+    }
+
+    private fun updateAttributeValue(
+        variant: ProductVariant,
+        attributeName: String,
+        value: AttributeValueDto,
+        remove: Boolean = false
+    ): Boolean? {
+        return variant.attributeCollection.attributes
+            .firstOrNull { it.attributeName == attributeName }
+            ?.let { attribute ->
+                addOrRemoveValueToAttribute(attribute, value, attributeName, remove)
+            }
     }
 
     private fun addOrRemoveValueToAttribute(
@@ -271,29 +258,6 @@ class InAppProductVariantServiceImpl(
         is StringAttributeDto -> {
             addOrRemoveStringAttributeValue(value, attributeName, attribute, remove)
         }
-    }
-
-    private fun getProductVariantOrThrow(idStr: String, id: Long): ProductVariant {
-        return productVariantRepository.findById(id).orElseThrow {
-            val msg = "Product Variant with ID=$idStr not found."
-            ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-        }
-    }
-
-    private fun updateProductVariantSku(idStr: String, id: Long, mapper: (Sku) -> Sku) {
-        val variant = getProductVariantOrThrow(idStr, id)
-        variant.skuCollection.skus.map(mapper)
-        productVariantRepository.save(variant)
-    }
-
-    private fun updateProductVariant(
-        idStr: String,
-        id: Long,
-        mapper: (ProductVariant) -> ProductVariant
-    ): ProductVariant {
-        var variant = getProductVariantOrThrow(idStr, id)
-        variant = mapper(variant)
-        return productVariantRepository.save(variant)
     }
 
     private fun addOrRemoveStringAttributeValue(
@@ -362,6 +326,29 @@ class InAppProductVariantServiceImpl(
         } else {
             attribute.availableValues.add(value)
         }
+    }
+
+    private fun getProductVariantOrThrow(idStr: String, id: Long): ProductVariant {
+        return productVariantRepository.findById(id).orElseThrow {
+            val msg = "Product Variant with ID=$idStr not found."
+            ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
+        }
+    }
+
+    private fun updateProductVariantSku(idStr: String, id: Long, mapper: (Sku) -> Sku) {
+        val variant = getProductVariantOrThrow(idStr, id)
+        variant.skuCollection.skus.map(mapper)
+        productVariantRepository.save(variant)
+    }
+
+    private fun updateProductVariant(
+        idStr: String,
+        id: Long,
+        mapper: (ProductVariant) -> ProductVariant
+    ): ProductVariant {
+        var variant = getProductVariantOrThrow(idStr, id)
+        variant = mapper(variant)
+        return productVariantRepository.save(variant)
     }
 
     companion object {
