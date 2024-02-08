@@ -19,6 +19,41 @@ class ProductVariantRepositoryTest @Autowired constructor(
     private val om: ObjectMapper
 ) : BaseJpaTest() {
 
+    @Test
+    fun removeCompositeAttributeColorValue_removesValue() {
+        productVariantRepository.removeCompositeAttributeColorValue(
+            1,
+            COLOR_COMPOSITE_ATTR_NAME,
+            COLOR_SHADE_ATTR_NAME,
+            BLUE
+        )
+        val colorComposite = productVariantRepository.findById(1).get()
+            .attributeCollection.attributes.first { it.attributeName == COLOR_COMPOSITE_ATTR_NAME }
+            as CompositeAttributeDto
+        val values = colorComposite.subAttributes.first { it.attributeName == COLOR_SHADE_ATTR_NAME }
+            .availableValues
+        assertThat(values).hasSize(1)
+        val colorValues = values.map { (it as ColorAttributeValueDto).colorValue }
+        assertThat(colorValues).containsExactly(RED)
+    }
+
+    @Test
+    fun removeCompositeAttributeStringValue_removesValue() {
+        productVariantRepository.removeCompositeAttributeStringValue(
+            1,
+            STRING_COMPOSITE_ATTR_NAME,
+            STRING_SUBATTR_NAME,
+            SIZE_XS_VALUE
+        )
+        val stringComposite = productVariantRepository.findById(1).get()
+            .attributeCollection.attributes.first { it.attributeName == STRING_COMPOSITE_ATTR_NAME }
+            as CompositeAttributeDto
+        val values = stringComposite.subAttributes.first { it.attributeName ==  STRING_SUBATTR_NAME}
+            .availableValues
+        assertThat(values).hasSize(1)
+        val strValues = values.map { (it as StringAttributeValueDto).stringValue }
+        assertThat(strValues).containsExactly(SIZE_S_VALUE)
+    }
 
     @Test
     fun removeCompositeNumericAttributeValue_removesValue() {
@@ -129,7 +164,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
         productVariantRepository.removeVariantAttribute(1, COLOR_ATTR_NAME)
         val attributes = productVariantRepository.findById(1)
             .get().attributeCollection.attributes
-        assertThat(attributes).hasSize(3) // size + weight + dimens
+        assertThat(attributes).hasSize(5) // size + weight + dimens + colorComposite + stringComposite
     }
 
     @Test
@@ -152,7 +187,7 @@ class ProductVariantRepositoryTest @Autowired constructor(
 
         val attributes = productVariantRepository.findById(1)
             .get().attributeCollection.attributes
-        assertThat(attributes).hasSize(4) // size + weight + dimens + color
+        assertThat(attributes).hasSize(6) // color + size + weight + dimens + colorComposite + stringComposite
         assertThat(attributes).contains(sizeAttr)
     }
 
@@ -174,9 +209,10 @@ class ProductVariantRepositoryTest @Autowired constructor(
         val colorAttrStr = om.writeValueAsString(colorAttr)
         productVariantRepository.addOrReplaceVariantAttribute(1, colorAttrStr, COLOR_ATTR_NAME)
 
-        val attributes = productVariantRepository.findById(1)
-            .get().attributeCollection.attributes
-        assertThat(attributes).hasSize(4) // color + size + weight + dimens
+        val variant = productVariantRepository.findById(1)
+            .get()
+        val attributes = variant.attributeCollection.attributes
+        assertThat(attributes).hasSize(6) // color + size + weight + dimens + colorComposite + stringComposite
         assertThat(attributes).contains(colorAttr)
     }
 

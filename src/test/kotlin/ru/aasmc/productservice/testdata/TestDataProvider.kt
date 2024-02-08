@@ -46,6 +46,90 @@ fun sizeDimensionsColorsAttributes(): List<AttributeDto> = listOf(
     colorAttributeDto()
 )
 
+fun stringComposite() = CompositeAttributeDto(
+    id = STRING_COMPOSITE_ATTR_ID,
+    attributeName = STRING_COMPOSITE_ATTR_NAME,
+    shortName = STRING_COMPOSITE_ATTR_NAME,
+    isFaceted = true,
+    isRequired = true,
+    subAttributes = mutableListOf(
+        StringAttributeDto(
+            id = STRING_COMPOSITE_SUB_ATTR_ID,
+            attributeName = STRING_SUBATTR_NAME,
+            shortName = STRING_SUBATTR_NAME,
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                StringAttributeValueDto(
+                    stringValue = SIZE_XS_VALUE,
+                    stringRuValue = SIZE_44_VALUE
+                ),
+                StringAttributeValueDto(
+                    stringValue = SIZE_S_VALUE,
+                    stringRuValue = SIZE_46_VALUE
+                )
+            )
+        ),
+        StringAttributeDto(
+            id = "Second String subattribute id",
+            attributeName = "Second String subattribute name",
+            shortName = "Second String subattribute name",
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                StringAttributeValueDto(
+                    stringValue = SIZE_L_VALUE,
+                    stringRuValue = SIZE_50_VALUE
+                ),
+                StringAttributeValueDto(
+                    stringValue = SIZE_XL_VALUE,
+                    stringRuValue = SIZE_50_VALUE
+                )
+            )
+        )
+    )
+)
+
+fun colorComposite() = CompositeAttributeDto(
+    id = COLOR_COMPOSITE_ATTR_ID,
+    attributeName = COLOR_COMPOSITE_ATTR_NAME,
+    shortName = COLOR_COMPOSITE_ATTR_NAME,
+    isFaceted = true,
+    isRequired = true,
+    subAttributes = mutableListOf(
+        ColorAttributeDto(
+            id = COLOR_COMPOSITE_SUB_ATTR_ID,
+            attributeName = COLOR_SHADE_ATTR_NAME,
+            shortName = COLOR_SHADE_ATTR_NAME,
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                ColorAttributeValueDto(
+                    colorHex = BLUE_HEX,
+                    colorValue = BLUE
+                ),
+                ColorAttributeValueDto(
+                    colorHex = RED_HEX,
+                    colorValue = RED
+                )
+            )
+        ),
+        ColorAttributeDto(
+            id = "secondSubAttrId",
+            attributeName = "Shade2 name",
+            shortName = "Shade2 name",
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                ColorAttributeValueDto(
+                    colorHex = GREEN_HEX,
+                    colorValue = GREEN
+                )
+            )
+        )
+    )
+)
+
 
 fun dimensionsAttributeDto(isRequired: Boolean) = CompositeAttributeDto(
     attributeName = DIMENS_ATTR_NAME,

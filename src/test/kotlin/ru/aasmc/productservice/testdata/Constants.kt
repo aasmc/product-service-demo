@@ -65,7 +65,16 @@ const val GREEN = "green"
 
 const val COLOR_ATTR_NAME = "color"
 const val COLOR_ATTR_ID = "colorAttrId"
+const val COLOR_COMPOSITE_ATTR_ID = "colorCompositeAttrId"
+const val COLOR_COMPOSITE_ATTR_NAME = "Color Composite name"
+const val COLOR_COMPOSITE_SUB_ATTR_ID = "colorCompositeSubAttrId"
+const val COLOR_SHADE_ATTR_NAME = "Color Shade"
+
 const val STRING_ATTR_ID = "stringAttrId"
+const val STRING_COMPOSITE_ATTR_ID = "stringCompositeAttrId"
+const val STRING_COMPOSITE_SUB_ATTR_ID = "stringCompositeAttrId"
+const val STRING_COMPOSITE_ATTR_NAME = "String Composite attr name"
+const val STRING_SUBATTR_NAME = "A string attribute name"
 
 const val WEIGHT_ATTR_NAME = "weight"
 const val WEIGHT_ATTR_ID = "weightId"
