@@ -19,29 +19,6 @@ class ProductVariantRepositoryTest @Autowired constructor(
     private val om: ObjectMapper
 ) : BaseJpaTest() {
 
-    @Test
-    fun addCompositeAttributeValue_addsValue() {
-        val width40 = NumericAttributeValueDto(
-            numValue = 40.0,
-            numRuValue = null,
-            numUnit = "mm"
-        )
-        val widthStr = om.writeValueAsString(width40)
-        productVariantRepository.addCompositeAttributeValue(
-            1,
-            DIMENS_ATTR_NAME,
-            DIMENS_WIDTH_NAME,
-            widthStr
-        )
-        val dimens = productVariantRepository.findById(1).get()
-            .attributeCollection.attributes
-            .first { it.attributeName == DIMENS_ATTR_NAME } as CompositeAttributeDto
-        val newValues = dimens.subAttributes.first { it.attributeName == DIMENS_WIDTH_NAME }
-            .availableValues
-        assertThat(newValues).hasSize(4)
-        val nums = newValues.map { (it as NumericAttributeValueDto).numValue }
-        assertThat(nums).contains(width40.numValue)
-    }
 
     @Test
     fun removeCompositeNumericAttributeValue_removesValue() {
@@ -100,6 +77,30 @@ class ProductVariantRepositoryTest @Autowired constructor(
             .availableValues
 
         assertThat(availableValues).isEmpty()
+    }
+
+    @Test
+    fun addCompositeAttributeValue_addsValue() {
+        val width40 = NumericAttributeValueDto(
+            numValue = 40.0,
+            numRuValue = null,
+            numUnit = "mm"
+        )
+        val widthStr = om.writeValueAsString(width40)
+        productVariantRepository.addCompositeAttributeValue(
+            1,
+            DIMENS_ATTR_NAME,
+            DIMENS_WIDTH_NAME,
+            widthStr
+        )
+        val dimens = productVariantRepository.findById(1).get()
+            .attributeCollection.attributes
+            .first { it.attributeName == DIMENS_ATTR_NAME } as CompositeAttributeDto
+        val newValues = dimens.subAttributes.first { it.attributeName == DIMENS_WIDTH_NAME }
+            .availableValues
+        assertThat(newValues).hasSize(4)
+        val nums = newValues.map { (it as NumericAttributeValueDto).numValue }
+        assertThat(nums).contains(width40.numValue)
     }
 
     @Test

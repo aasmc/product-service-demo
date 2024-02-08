@@ -30,6 +30,79 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
             COALESCE(
                      (SELECT jsonb_agg(elem)
                          FROM jsonb_array_elements(attribute_collection->'attributes'->ap.idx->'subAttributes'->sap.idx->'availableValues') elem
+                         WHERE elem->>'colorValue' != :colorValue 
+                     ),
+                     '[]'\:\:jsonb
+                 )
+        )
+        FROM attr_path ap, sub_attr_path sap 
+        WHERE id = :variantId
+    """, nativeQuery = true)
+    fun removeCompositeAttributeColorValue(
+        @Param("variantId") variantId: Long,
+        @Param("attrName") attrName: String,
+        @Param("subAttrName") subAttrName: String,
+        @Param("colorValue") colorValue: String,
+    )
+
+    @Modifying
+    @Query("""
+        WITH attr_path AS (
+            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
+            CAST((index - 1) AS INTEGER) AS idx 
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :attrName
+        ),
+         sub_attr_path AS (
+            SELECT('{attributes,'||(SELECT idx FROM attr_path)||',subAttributes,'||index - 1||',availableValues}')\:\:text[] as path,
+            CAST((index - 1) AS INTEGER) AS idx
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes'->(SELECT idx AS INTEGER FROM attr_path)->'subAttributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :subAttrName
+        )
+        UPDATE product_variants
+        SET attribute_collection = jsonb_set(
+            attribute_collection,
+            sap.path,
+            COALESCE(
+                     (SELECT jsonb_agg(elem)
+                         FROM jsonb_array_elements(attribute_collection->'attributes'->ap.idx->'subAttributes'->sap.idx->'availableValues') elem
+                         WHERE elem->>'stringValue' != :stringValue 
+                     ),
+                     '[]'\:\:jsonb
+                 )
+        )
+        FROM attr_path ap, sub_attr_path sap 
+        WHERE id = :variantId
+    """, nativeQuery = true)
+    fun removeCompositeAttributeStringValue(
+        @Param("variantId") variantId: Long,
+        @Param("attrName") attrName: String,
+        @Param("subAttrName") subAttrName: String,
+        @Param("stringValue") stringValue: String,
+    )
+
+
+    @Modifying
+    @Query("""
+        WITH attr_path AS (
+            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
+            CAST((index - 1) AS INTEGER) AS idx 
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :attrName
+        ),
+         sub_attr_path AS (
+            SELECT('{attributes,'||(SELECT idx FROM attr_path)||',subAttributes,'||index - 1||',availableValues}')\:\:text[] as path,
+            CAST((index - 1) AS INTEGER) AS idx
+            FROM product_variants, jsonb_array_elements(attribute_collection->'attributes'->(SELECT idx AS INTEGER FROM attr_path)->'subAttributes') WITH ORDINALITY arr(elem, index)
+            WHERE id = :variantId AND elem->>'attributeName' = :subAttrName
+        )
+        UPDATE product_variants
+        SET attribute_collection = jsonb_set(
+            attribute_collection,
+            sap.path,
+            COALESCE(
+                     (SELECT jsonb_agg(elem)
+                         FROM jsonb_array_elements(attribute_collection->'attributes'->ap.idx->'subAttributes'->sap.idx->'availableValues') elem
                          WHERE CAST(elem->>'numValue' AS DOUBLE PRECISION) != :numValue 
                      ),
                      '[]'\:\:jsonb
