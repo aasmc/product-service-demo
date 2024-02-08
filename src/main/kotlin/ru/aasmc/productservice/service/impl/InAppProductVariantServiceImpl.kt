@@ -2,7 +2,6 @@ package ru.aasmc.productservice.service.impl
 
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import ru.aasmc.productservice.dto.*
@@ -142,7 +141,27 @@ class InAppProductVariantServiceImpl(
         subAttributeName: String,
         value: AttributeValueDto
     ): ProductVariantResponse {
-        TODO("Not yet implemented")
+        val id = cryptoTool.idOf(variantId)
+        val variant = getProductVariantOrThrow(variantId, id)
+        val added = variant.attributeCollection.attributes
+            .firstOrNull { it.attributeName == attributeName }
+            ?.let { attrDto ->
+                val composite = attrDto as? CompositeAttributeDto ?: throw ProductServiceException(
+                    "Cannot add value to attribute, because the attribute $attributeName is not composite",
+                    HttpStatus.BAD_REQUEST.value()
+                )
+                composite.subAttributes
+                    .firstOrNull { it.attributeName == subAttributeName }
+                    ?.let { subAttr ->
+                        addOrRemoveValueToAttribute(subAttr, value, subAttributeName)
+                    }
+            }
+        if (added == null || !added) {
+            log.info("Failed to add value: {} to composite attribute with name: {}", value, attributeName)
+        } else {
+            log.info("Successfully added value: {} to composite attribute with name: {}", value, attributeName)
+        }
+        return productVariantMapper.toProductVariantFullResponse(variant)
     }
 
     override fun addAttributeValue(
@@ -155,24 +174,7 @@ class InAppProductVariantServiceImpl(
         val added = variant.attributeCollection.attributes
             .firstOrNull { it.attributeName == attributeName }
             ?.let { attribute ->
-                when (attribute) {
-                    is ColorAttributeDto -> {
-                        addOrRemoveColorAttributeValue(value, attributeName, attribute)
-                    }
-
-                    is CompositeAttributeDto -> {
-                        // we don't add values directly to composite attributes
-                        false
-                    }
-
-                    is NumericAttributeDto -> {
-                        addOrRemoveNumericAttributeValue(value, attributeName, attribute)
-                    }
-
-                    is StringAttributeDto -> {
-                        addOrRemoveStringAttributeValue(value, attributeName, attribute)
-                    }
-                }
+                addOrRemoveValueToAttribute(attribute, value, attributeName)
             }
         if (added == null || !added) {
             log.info("Failed to add value: {} to attribute with name: {}", value, attributeName)
@@ -224,7 +226,51 @@ class InAppProductVariantServiceImpl(
         subAttributeName: String,
         value: AttributeValueDto
     ): ProductVariantResponse {
-        TODO("Not yet implemented")
+        val id = cryptoTool.idOf(variantId)
+        val variant = getProductVariantOrThrow(variantId, id)
+        val removed = variant.attributeCollection.attributes
+            .firstOrNull { it.attributeName == attributeName }
+            ?.let { attrDto ->
+                val composite = attrDto as? CompositeAttributeDto ?: throw ProductServiceException(
+                    "Cannot remove value from attribute, because the attribute $attributeName is not composite",
+                    HttpStatus.BAD_REQUEST.value()
+                )
+                composite.subAttributes
+                    .firstOrNull { it.attributeName == subAttributeName }
+                    ?.let { subAttr ->
+                        addOrRemoveValueToAttribute(subAttr, value, subAttributeName, true)
+                    }
+            }
+        if (removed == null || !removed) {
+            log.info("Failed to remove value: {} from composite attribute with name: {}", value, attributeName)
+        } else {
+            log.info("Successfully removed value: {} from composite attribute with name: {}", value, attributeName)
+        }
+        return productVariantMapper.toProductVariantFullResponse(variant)
+    }
+
+    private fun addOrRemoveValueToAttribute(
+        attribute: AttributeDto,
+        value: AttributeValueDto,
+        attributeName: String,
+        remove: Boolean = false
+    ) = when (attribute) {
+        is ColorAttributeDto -> {
+            addOrRemoveColorAttributeValue(value, attributeName, attribute, remove)
+        }
+
+        is CompositeAttributeDto -> {
+            // we don't add values directly to composite attributes
+            false
+        }
+
+        is NumericAttributeDto -> {
+            addOrRemoveNumericAttributeValue(value, attributeName, attribute, remove)
+        }
+
+        is StringAttributeDto -> {
+            addOrRemoveStringAttributeValue(value, attributeName, attribute, remove)
+        }
     }
 
     private fun getProductVariantOrThrow(idStr: String, id: Long): ProductVariant {
