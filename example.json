@@ -1,0 +1,71 @@
+[
+  {
+    "attrName": "clothes size",
+    "skus": [
+      {
+        "attrValue": "XS",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/blue/XS/Brand/230"
+      },
+      {
+        "attrValue": "S",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/blue/S/Brand/231"
+      },
+      {
+        "attrValue": "M",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/blue/M/Brand/232"
+      }
+    ]
+  },
+  {
+    "attrName": "clothes size",
+    "skus": [
+      {
+        "attrValue": "M",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/red/M/Brand/236"
+      },
+      {
+        "attrValue": "L",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/red/L/Brand/237"
+      },
+      {
+        "attrValue": "XL",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/red/XL/Brand/238"
+      }
+    ]
+  },
+  {
+    "attrName": "clothes size",
+    "skus": [
+      {
+        "attrValue": "S",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/green/S/Brand/233"
+      },
+      {
+        "attrValue": "M",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/green/M/Brand/234"
+      },
+      {
+        "attrValue": "L",
+        "price": 10,
+        "stock": 10,
+        "sku": "t-shirt/green/L/Brand/235"
+      }
+    ]
+  }
+]

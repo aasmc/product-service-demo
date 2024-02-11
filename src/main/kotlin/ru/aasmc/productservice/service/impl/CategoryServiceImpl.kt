@@ -8,7 +8,7 @@ import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.CategoryResponse
 import ru.aasmc.productservice.dto.CreateCategoryRequest
 import ru.aasmc.productservice.errors.ProductServiceException
-import ru.aasmc.productservice.mapper.AttributeMapper
+import ru.aasmc.productservice.mapper.AttributeMappers
 import ru.aasmc.productservice.mapper.CategoryMapper
 import ru.aasmc.productservice.service.CategoryService
 import ru.aasmc.productservice.storage.model.Category
@@ -23,7 +23,7 @@ class CategoryServiceImpl(
     private val categoryRepository: CategoryRepository,
     private val mapper: CategoryMapper,
     private val cryptoTool: CryptoTool,
-    private val attributeMapper: AttributeMapper,
+    private val attributeMapper: AttributeMappers,
     private val attributeRepository: AttributeRepository
 ) : CategoryService {
 

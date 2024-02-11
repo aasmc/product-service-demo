@@ -10,7 +10,9 @@ import ru.aasmc.productservice.mapper.ProductMapper
 import ru.aasmc.productservice.mapper.ProductVariantMapper
 import ru.aasmc.productservice.service.ProductOutboxService
 import ru.aasmc.productservice.service.ProductService
-import ru.aasmc.productservice.storage.model.EventType
+import ru.aasmc.productservice.service.UpdateOutboxService
+import ru.aasmc.productservice.storage.model.Product
+import ru.aasmc.productservice.storage.model.jsonb_data.EventType
 import ru.aasmc.productservice.storage.repository.ProductRepository
 import ru.aasmc.productservice.storage.repository.ProductVariantRepository
 import ru.aasmc.productservice.utils.CryptoTool
@@ -23,7 +25,8 @@ class ProductServiceImpl(
     private val mapper: ProductMapper,
     private val productVariantMapper: ProductVariantMapper,
     private val productVariantRepository: ProductVariantRepository,
-    private val productOutboxService: ProductOutboxService
+    private val productOutboxService: ProductOutboxService,
+    private val updateOutboxService: UpdateOutboxService
 ): ProductService {
 
     override fun createProduct(dto: CreateProductRequest): ProductResponse {
@@ -31,69 +34,74 @@ class ProductServiceImpl(
         // category have been filled, or is a check-up on front enough?
         val product = productRepository.save(mapper.toDomain(dto))
         log.debug("Successfully saved product: {}", product)
-        productOutboxService.addEvent(product.id!!, product, EventType.INSERT)
+        productOutboxService.addProductEvent(product.id!!, product, EventType.INSERT)
         return mapper.toProductResponseDto(product)
     }
 
-    override fun getProductById(id: String): ProductResponse {
-        val product = productRepository.findById(cryptoTool.idOf(id))
-            .orElseThrow {
-                val msg = "Product with ID=$id not found"
-                ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-            }
+    override fun getProductById(productId: String): ProductResponse {
+        val product = getProductOrThrow(cryptoTool.idOf(productId), productId)
         log.debug("Found product: {}", product)
         return mapper.toProductResponseDto(product)
     }
 
-    override fun getProductVariants(id: String): List<ProductVariantResponse> {
-        val product = productRepository.findById(cryptoTool.idOf(id))
-            .orElseThrow {
-                val msg = "Product with ID=$id not found"
-                ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-            }
+    override fun getProductVariants(productId: String): List<ProductVariantResponse> {
+        val product = getProductOrThrow(cryptoTool.idOf(productId), productId)
         log.debug("Found product in getProductVariants. {}", product)
         return product.variants.map(productVariantMapper::toProductVariantFullResponse)
     }
 
     override fun addProductVariant(productId: String, dto: ProductVariantRequestDto): ProductVariantResponse {
-        val product = productRepository.findById(cryptoTool.idOf(productId))
-            .orElseThrow {
-                val msg = "Product with ID=$productId not found"
-                ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-            }
+        val product = getProductOrThrow(cryptoTool.idOf(productId), productId)
         val variant = productVariantMapper.toDomain(dto, product)
         product.variants.add(variant)
         productRepository.save(product)
+        productRepository.flush()
         log.debug("Successfully added variant {} to product {}", variant, product)
-        productOutboxService.addEvent(product.id!!, product, EventType.UPDATE)
+        productOutboxService.addProductVariantEvent(product.id!!, variant.id!!, EventType.INSERT, variant)
         return productVariantMapper.toProductVariantFullResponse(variant)
     }
 
     override fun deleteProductVariant(productId: String, variantId: String) {
-        val product = productRepository.findById(cryptoTool.idOf(productId))
-            .orElseThrow {
-                val msg = "Product with ID=$productId not found"
-                ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-            }
-        // TODO find out if this remove is necessary
-        product.variants.removeIf { variant -> variant.id == cryptoTool.idOf(variantId) }
-        productVariantRepository.deleteById(cryptoTool.idOf(variantId))
+        val vId = cryptoTool.idOf(variantId)
+        val product = getProductOrThrow(cryptoTool.idOf(productId), productId)
+        product.variants.removeIf { variant -> variant.id == vId }
+        productVariantRepository.deleteById(vId)
         log.debug("Successfully deleted product variant with ID=$variantId")
+        productOutboxService.addProductVariantEvent(product.id!!, vId, EventType.DELETE, null)
         productRepository.save(product)
-        productOutboxService.addEvent(product.id!!, product, EventType.UPDATE)
     }
 
     override fun deleteProduct(productId: String) {
         val id = cryptoTool.idOf(productId)
-        val product = productRepository.findById(id)
-            .orElseThrow {
-                val msg = "Product with ID=$productId not found"
-                ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
-            }
+        val product = getProductOrThrow(id, productId)
         product.shop.products.remove(product)
         productRepository.deleteById(id)
         log.debug("Successfully deleted product with ID=$productId")
-        productOutboxService.addEvent(cryptoTool.idOf(productId), null, EventType.DELETE)
+        productOutboxService.addProductEvent(cryptoTool.idOf(productId), null, EventType.DELETE)
+    }
+
+    override fun updateProduct(productId: String, update: ProductUpdateDto): ProductResponse {
+        val id = cryptoTool.idOf(productId)
+        var product = getProductOrThrow(id, productId)
+        update.newName?.let { newName ->
+            product.name = newName
+            updateOutboxService.saveUpdateProductNameEvent(id, newName)
+        }
+        update.newDescription?.let { newDescription ->
+            product.description = newDescription
+            updateOutboxService.saveUpdateProductDescriptionEvent(id, newDescription)
+        }
+        product = productRepository.save(product)
+        log.info("Successfully updated product with ID={}", id)
+        return mapper.toProductResponseDto(product)
+    }
+
+    private fun getProductOrThrow(id: Long, stringId: String): Product {
+        return productRepository.findById(id)
+            .orElseThrow {
+                val msg = "Product with ID=$stringId not found"
+                ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
+            }
     }
 
     companion object {

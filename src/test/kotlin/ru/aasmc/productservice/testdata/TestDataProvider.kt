@@ -43,7 +43,91 @@ fun categoryAttributesToCreate(): List<AttributeDto> =
 fun sizeDimensionsColorsAttributes(): List<AttributeDto> = listOf(
     sizeAttributeDto(true),
     dimensionsAttributeDto(true),
-    colorAttributeRequest()
+    colorAttributeDto()
+)
+
+fun stringComposite() = CompositeAttributeDto(
+    id = STRING_COMPOSITE_ATTR_ID,
+    attributeName = STRING_COMPOSITE_ATTR_NAME,
+    shortName = STRING_COMPOSITE_ATTR_NAME,
+    isFaceted = true,
+    isRequired = true,
+    subAttributes = mutableListOf(
+        StringAttributeDto(
+            id = STRING_COMPOSITE_SUB_ATTR_ID,
+            attributeName = STRING_SUBATTR_NAME,
+            shortName = STRING_SUBATTR_NAME,
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                StringAttributeValueDto(
+                    stringValue = SIZE_XS_VALUE,
+                    stringRuValue = SIZE_44_VALUE
+                ),
+                StringAttributeValueDto(
+                    stringValue = SIZE_S_VALUE,
+                    stringRuValue = SIZE_46_VALUE
+                )
+            )
+        ),
+        StringAttributeDto(
+            id = "Second String subattribute id",
+            attributeName = "Second String subattribute name",
+            shortName = "Second String subattribute name",
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                StringAttributeValueDto(
+                    stringValue = SIZE_L_VALUE,
+                    stringRuValue = SIZE_50_VALUE
+                ),
+                StringAttributeValueDto(
+                    stringValue = SIZE_XL_VALUE,
+                    stringRuValue = SIZE_50_VALUE
+                )
+            )
+        )
+    )
+)
+
+fun colorComposite() = CompositeAttributeDto(
+    id = COLOR_COMPOSITE_ATTR_ID,
+    attributeName = COLOR_COMPOSITE_ATTR_NAME,
+    shortName = COLOR_COMPOSITE_ATTR_NAME,
+    isFaceted = true,
+    isRequired = true,
+    subAttributes = mutableListOf(
+        ColorAttributeDto(
+            id = COLOR_COMPOSITE_SUB_ATTR_ID,
+            attributeName = COLOR_SHADE_ATTR_NAME,
+            shortName = COLOR_SHADE_ATTR_NAME,
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                ColorAttributeValueDto(
+                    colorHex = BLUE_HEX,
+                    colorValue = BLUE
+                ),
+                ColorAttributeValueDto(
+                    colorHex = RED_HEX,
+                    colorValue = RED
+                )
+            )
+        ),
+        ColorAttributeDto(
+            id = "secondSubAttrId",
+            attributeName = "Shade2 name",
+            shortName = "Shade2 name",
+            isFaceted = true,
+            isRequired = true,
+            availableValues = mutableListOf(
+                ColorAttributeValueDto(
+                    colorHex = GREEN_HEX,
+                    colorValue = GREEN
+                )
+            )
+        )
+    )
 )
 
 
@@ -52,117 +136,114 @@ fun dimensionsAttributeDto(isRequired: Boolean) = CompositeAttributeDto(
     shortName = DIMENS_ATTR_SHORT_NAME,
     isFaceted = true,
     isRequired = isRequired,
-    availableValues = dimensAttributeCompositeValues()
+    subAttributes = dimensAttributeCompositeValues()
 )
 
-fun dimensAttributeDomain(): Attribute {
-    val attr = Attribute(
+fun dimensAttributeDomain(): CompositeAttribute {
+    val attr = CompositeAttribute(
         name = DIMENS_ATTR_NAME,
         shortName = DIMENS_ATTR_SHORT_NAME,
         isFaceted = true,
-        isComposite = true
-    )
-
-    val values = listOf(
-        CompositeAttributeValue(
-            name = DIMENS_WIDTH_NAME,
-            attribute = attr
-        ),
-        CompositeAttributeValue(
-            name = DIMENS_LENGTH_NAME,
-            attribute = attr
-        ),
-        CompositeAttributeValue(
-            name = DIMENS_DEPTH_NAME,
-            attribute = attr
-        )
-    )
-    values[0].value.addAll(
-        listOf(
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[0],
-                numValue = DIMENS_WIDTH_VALUE_10,
-                numUnit = "mm",
-                numRuValue = null
+        subAttributes = hashSetOf(
+            NumericAttribute(
+                name = DIMENS_WIDTH_NAME,
+                shortName = DIMENS_WIDTH_NAME,
+                isFaceted = true,
+                numericValues = arrayListOf(
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_WIDTH_VALUE_10,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    ),
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_WIDTH_VALUE_20,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    ),
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_WIDTH_VALUE_30,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    )
+                )
             ),
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[0],
-                numValue = DIMENS_WIDTH_VALUE_20,
-                numUnit = "mm",
-                numRuValue = null
+            NumericAttribute(
+                name = DIMENS_LENGTH_NAME,
+                shortName = DIMENS_LENGTH_NAME,
+                isFaceted = true,
+                numericValues = arrayListOf(
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_LENGTH_VALUE_10,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    ),
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_LENGTH_VALUE_20,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    ),
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_LENGTH_VALUE_30,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    )
+                )
             ),
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[0],
-                numValue = DIMENS_WIDTH_VALUE_30,
-                numUnit = "mm",
-                numRuValue = null
-            ),
-        )
-    )
-
-    values[1].value.addAll(
-        listOf(
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[1],
-                numValue = DIMENS_LENGTH_VALUE_10,
-                numUnit = "mm",
-                numRuValue = null
-            ),
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[1],
-                numValue = DIMENS_LENGTH_VALUE_20,
-                numUnit = "mm",
-                numRuValue = null
-            ),
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[1],
-                numValue = DIMENS_LENGTH_VALUE_30,
-                numUnit = "mm",
-                numRuValue = null
-            ),
-        )
-    )
-
-    values[2].value.addAll(
-        listOf(
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[2],
-                numValue = DIMENS_DEPTH_VALUE_10,
-                numUnit = "mm",
-                numRuValue = null
-            ),
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[2],
-                numValue = DIMENS_DEPTH_VALUE_20,
-                numUnit = "mm",
-                numRuValue = null
-            ),
-            NumericAttributeValue(
-                attribute = attr,
-                compositeAttributeValue = values[2],
-                numValue = DIMENS_DEPTH_VALUE_30,
-                numUnit = "mm",
-                numRuValue = null
+            NumericAttribute(
+                name = DIMENS_DEPTH_NAME,
+                shortName = DIMENS_DEPTH_NAME,
+                isFaceted = true,
+                numericValues = arrayListOf(
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_DEPTH_VALUE_10,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    ),
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_DEPTH_VALUE_20,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    ),
+                    NumericAttributeValueDto(
+                        numValue = DIMENS_DEPTH_VALUE_30,
+                        numRuValue = null,
+                        numUnit = "mm"
+                    )
+                )
             ),
         )
     )
-    attr.compositeAttributeValues.addAll(values)
     return attr
 }
 
-fun dimensAttributeCompositeValues(): List<CompositeAttributeValueDto> =
+fun numericAttributeDto(id: String? = null): NumericAttributeDto =
+    NumericAttributeDto(
+        id = id,
+        attributeName = WEIGHT_ATTR_NAME,
+        shortName = WEIGHT_ATTR_NAME,
+        isFaceted = true,
+        isRequired = true,
+        availableValues = mutableListOf(
+            NumericAttributeValueDto(
+                numValue = WEIGHT_VALUE_100,
+                numRuValue = WEIGHT_RU_VALUE_100,
+                numUnit = WEIGHT_UNIT
+            ),
+            NumericAttributeValueDto(
+                numValue = WEIGHT_VALUE_200,
+                numRuValue = WEIGHT_RU_VALUE_200,
+                numUnit = WEIGHT_UNIT
+            ),
+        )
+    )
+
+fun dimensAttributeCompositeValues(): List<AttributeDto> =
     listOf(
-        CompositeAttributeValueDto(
-            name = DIMENS_WIDTH_NAME,
-            values = listOf(
+        NumericAttributeDto(
+            attributeName = DIMENS_WIDTH_NAME,
+            shortName = DIMENS_WIDTH_NAME,
+            isFaceted = true,
+            availableValues = mutableListOf(
                 NumericAttributeValueDto(
                     numValue = DIMENS_WIDTH_VALUE_10,
                     numRuValue = null,
@@ -180,10 +261,11 @@ fun dimensAttributeCompositeValues(): List<CompositeAttributeValueDto> =
                 )
             )
         ),
-
-        CompositeAttributeValueDto(
-            name = DIMENS_LENGTH_NAME,
-            values = listOf(
+        NumericAttributeDto(
+            attributeName = DIMENS_LENGTH_NAME,
+            shortName = DIMENS_LENGTH_NAME,
+            isFaceted = true,
+            availableValues = mutableListOf(
                 NumericAttributeValueDto(
                     numValue = DIMENS_LENGTH_VALUE_10,
                     numRuValue = null,
@@ -201,9 +283,11 @@ fun dimensAttributeCompositeValues(): List<CompositeAttributeValueDto> =
                 )
             )
         ),
-        CompositeAttributeValueDto(
-            name = DIMENS_DEPTH_NAME,
-            values = listOf(
+        NumericAttributeDto(
+            attributeName = DIMENS_DEPTH_NAME,
+            shortName = DIMENS_DEPTH_NAME,
+            isFaceted = true,
+            availableValues = mutableListOf(
                 NumericAttributeValueDto(
                     numValue = DIMENS_DEPTH_VALUE_10,
                     numRuValue = null,
@@ -223,7 +307,7 @@ fun dimensAttributeCompositeValues(): List<CompositeAttributeValueDto> =
         )
     )
 
-fun sizeAttributeDto(isRequired: Boolean) = PlainAttributeDto(
+fun sizeAttributeDto(isRequired: Boolean) = StringAttributeDto(
     attributeName = CLOTHES_SIZE_ATTR_NAME,
     shortName = CLOTHES_SIZE_ATTR_SHORT_NAME,
     isFaceted = true,
@@ -231,65 +315,52 @@ fun sizeAttributeDto(isRequired: Boolean) = PlainAttributeDto(
     availableValues = sizeAttributeStringValues()
 )
 
-fun sizeAttributeDomain(): Attribute {
-    val attr = Attribute(
+fun sizeAttributeDomain(): StringAttribute {
+    val attr = StringAttribute(
         name = CLOTHES_SIZE_ATTR_NAME,
         shortName = CLOTHES_SIZE_ATTR_SHORT_NAME,
         isFaceted = true,
-        isComposite = false
     )
-    attr.attributeValues.addAll(
+    attr.stringValues.addAll(
         listOf(
-            StringAttributeValue(
-                attribute = attr,
+            StringAttributeValueDto(
                 stringValue = SIZE_XS_VALUE,
                 stringRuValue = SIZE_44_VALUE,
-                compositeAttributeValue = null
             ),
-            StringAttributeValue(
-                attribute = attr,
+            StringAttributeValueDto(
                 stringValue = SIZE_S_VALUE,
                 stringRuValue = SIZE_46_VALUE,
-                compositeAttributeValue = null
             ),
-            StringAttributeValue(
-                attribute = attr,
+            StringAttributeValueDto(
                 stringValue = SIZE_M_VALUE,
                 stringRuValue = SIZE_48_VALUE,
-                compositeAttributeValue = null
             ),
-            StringAttributeValue(
-                attribute = attr,
+            StringAttributeValueDto(
                 stringValue = SIZE_L_VALUE,
                 stringRuValue = SIZE_50_VALUE,
-                compositeAttributeValue = null
             ),
-            StringAttributeValue(
-                attribute = attr,
+            StringAttributeValueDto(
                 stringValue = SIZE_XL_VALUE,
                 stringRuValue = SIZE_52_VALUE,
-                compositeAttributeValue = null
             ),
-            StringAttributeValue(
-                attribute = attr,
+            StringAttributeValueDto(
                 stringValue = SIZE_XXL_VALUE,
                 stringRuValue = SIZE_54_VALUE,
-                compositeAttributeValue = null
             )
         )
     )
     return attr
 }
 
-fun sizeAttributeDtoWithNoValues() = PlainAttributeDto(
+fun sizeAttributeDtoWithNoValues() = StringAttributeDto(
     attributeName = CLOTHES_SIZE_ATTR_NAME,
     shortName = CLOTHES_SIZE_ATTR_SHORT_NAME,
     isFaceted = true,
-    availableValues = listOf()
+    availableValues = mutableListOf()
 )
 
-fun sizeAttributeStringValues(): List<AttributeValueDto> =
-    listOf(
+fun sizeAttributeStringValues(): MutableList<StringAttributeValueDto> =
+    mutableListOf(
         StringAttributeValueDto(
             stringValue = SIZE_XS_VALUE,
             stringRuValue = SIZE_44_VALUE
@@ -340,22 +411,32 @@ fun shopDomain(seller: Seller) = Shop(
 
 fun createTshirtRequest(
     shopId: String,
-    blueAttributes: List<AttributeDto>,
-    redAttributes: List<AttributeDto>,
-    greenAttributes: List<AttributeDto>
+    blueAttributes: MutableList<AttributeDto>,
+    blueSkuCollection: SkuCollection,
+    redAttributes: MutableList<AttributeDto>,
+    redSkuCollection: SkuCollection,
+    greenAttributes: MutableList<AttributeDto>,
+    greenSkuCollection: SkuCollection
 ) = CreateProductRequest(
     shopId = shopId,
     categoryName = TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME,
     name = PRODUCT_T_SHIRT_NAME,
     description = PRODUCT_T_SHIRT_DESCRIPTION,
-    variants = tShirtVariantDtos(blueAttributes, redAttributes, greenAttributes)
+    variants = tShirtVariantDtos(
+        blueAttributes,
+        blueSkuCollection,
+        redAttributes,
+        redSkuCollection,
+        greenAttributes,
+        greenSkuCollection
+    )
 )
 
-fun colorAttributeRequest(): AttributeDto = PlainAttributeDto(
+fun colorAttributeDto() = ColorAttributeDto(
     attributeName = COLOR_ATTR_NAME,
     shortName = COLOR_ATTR_NAME,
     isFaceted = true,
-    availableValues = listOf(
+    availableValues = mutableListOf(
         ColorAttributeValueDto(
             colorValue = BLUE,
             colorHex = BLUE_HEX
@@ -372,54 +453,50 @@ fun colorAttributeRequest(): AttributeDto = PlainAttributeDto(
 )
 
 fun colorAttributeDomain(): Attribute {
-    val attr = Attribute(
+    val attr = ColorAttribute(
         name = COLOR_ATTR_NAME,
         shortName = COLOR_ATTR_NAME,
         isFaceted = true,
-        isComposite = false
     )
-    attr.attributeValues.addAll(listOf(
-        ColorAttributeValue(
-            attribute = attr,
+    attr.colorValues.addAll(listOf(
+        ColorAttributeValueDto(
             colorValue = BLUE,
             colorHex = BLUE_HEX,
-            compositeAttributeValue = null
         ),
-        ColorAttributeValue(
-            attribute = attr,
+        ColorAttributeValueDto(
             colorValue = RED,
             colorHex = RED_HEX,
-            compositeAttributeValue = null
         ),
-        ColorAttributeValue(
-            attribute = attr,
+        ColorAttributeValueDto(
             colorValue = GREEN,
             colorHex = GREEN_HEX,
-            compositeAttributeValue = null
         )
     ))
     return attr
 }
 
 fun tShirtVariantDtos(
-    blueAttributes: List<AttributeDto>,
-    redAttributes: List<AttributeDto>,
-    greenAttributes: List<AttributeDto>
+    blueAttributes: MutableList<AttributeDto>,
+    blueSkuCollection: SkuCollection,
+    redAttributes: MutableList<AttributeDto>,
+    redSkuCollection: SkuCollection,
+    greenAttributes: MutableList<AttributeDto>,
+    greenSkuCollection: SkuCollection
 ): Set<ProductVariantRequestDto> =
     hashSetOf(
-        blueTShirtVariantDto(blueAttributes),
-        greenTShirtVariantDto(greenAttributes),
-        redTShirtVariantDto(redAttributes)
+        blueTShirtVariantDto(blueAttributes, blueSkuCollection),
+        greenTShirtVariantDto(greenAttributes, greenSkuCollection),
+        redTShirtVariantDto(redAttributes, redSkuCollection)
     )
 
 fun blueTShirtVariantDto(
-    attributes: List<AttributeDto>
+    attributes: MutableList<AttributeDto>,
+    skuCollection: SkuCollection
 ) = ProductVariantRequestDto(
     variantName = T_SHIRT_BLUE_VARIANT_NAME,
     price = BigDecimal.TEN,
-    stock = 10,
     images = ImageCollection(
-        images = arrayListOf(
+        images = hashSetOf(
             AppImage(
                 url = "http://imageurl.com/blue-image-primary.png",
                 isPrimary = true
@@ -429,17 +506,18 @@ fun blueTShirtVariantDto(
             )
         )
     ),
-    attributes = attributes
+    attributeCollection = AttributeCollection(attributes),
+    skuCollection = skuCollection
 )
 
 fun redTShirtVariantDto(
-    attributes: List<AttributeDto>
+    attributes: MutableList<AttributeDto>,
+    skuCollection: SkuCollection
 ) = ProductVariantRequestDto(
     variantName = T_SHIRT_RED_VARIANT_NAME,
     price = BigDecimal.TEN,
-    stock = 10,
     images = ImageCollection(
-        images = arrayListOf(
+        images = hashSetOf(
             AppImage(
                 url = "http://imageurl.com/red-image-primary.png",
                 isPrimary = true
@@ -449,17 +527,18 @@ fun redTShirtVariantDto(
             )
         )
     ),
-    attributes = attributes
+    attributeCollection = AttributeCollection(attributes),
+    skuCollection = skuCollection
 )
 
 fun greenTShirtVariantDto(
-    attributes: List<AttributeDto>
+    attributes: MutableList<AttributeDto>,
+    skuCollection: SkuCollection
 ) = ProductVariantRequestDto(
     variantName = T_SHIRT_GREEN_VARIANT_NAME,
     price = BigDecimal.TEN,
-    stock = 10,
     images = ImageCollection(
-        images = arrayListOf(
+        images = hashSetOf(
             AppImage(
                 url = "http://imageurl.com/green-image-primary.png",
                 isPrimary = true
@@ -469,5 +548,6 @@ fun greenTShirtVariantDto(
             )
         )
     ),
-    attributes = attributes
+    attributeCollection = AttributeCollection(attributes),
+    skuCollection = skuCollection
 )

@@ -44,10 +44,10 @@ class ProductMapper(
                 variantId = cryptoTool.hashOf(variant.id!!),
                 variantName = variant.variantName,
                 price = variant.price,
-                stock = variant.stock,
-                attributes = variant.attributes,
-                images = variant.images,
-                createdAt = variant.createdAt!!
+                attributesCollection = variant.attributeCollection,
+                images = variant.imageCollection,
+                createdAt = variant.createdAt!!,
+                skuCollection = variant.skuCollection
             )
         }
         return ProductResponse(

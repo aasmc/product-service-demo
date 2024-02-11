@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*
 import ru.aasmc.productservice.dto.AttributeDto
 import ru.aasmc.productservice.dto.AttributeValueDto
 import ru.aasmc.productservice.dto.AttributesCollection
-import ru.aasmc.productservice.dto.CompositeAttributeValueDto
 import ru.aasmc.productservice.service.AttributeService
 
 @RestController
@@ -50,28 +49,6 @@ class AttributeController(
     ): AttributeValueDto {
         log.info("Received PUT request to add value: {}, to attribute with ID={}", dto, attrId)
         return attributeService.addAttributeValue(attrId, dto)
-    }
-
-    @PutMapping("/{id}/compositeValue")
-    fun addCompositeAttributeValue(
-        @PathVariable("id") attrId: String,
-        @RequestBody dto: CompositeAttributeValueDto,
-    ): CompositeAttributeValueDto {
-        log.info("Received PUT request to add composite value: {}, to attribute with ID={}", dto, attrId)
-        return attributeService.addCompositeAttributeValue(attrId, dto)
-    }
-
-    @PutMapping("/compositeValue/{id}/value")
-    fun addValueToCompositeAttributeValue(
-        @PathVariable("id") compositeValueId: String,
-        @RequestBody dto: AttributeValueDto
-    ): AttributeValueDto {
-        log.info(
-            "Received PUT request to add attribute value: {} to a composite attribute value with ID={}",
-            dto,
-            compositeValueId
-        )
-        return attributeService.addValueToCompositeAttributeValue(compositeValueId, dto)
     }
 
     companion object {

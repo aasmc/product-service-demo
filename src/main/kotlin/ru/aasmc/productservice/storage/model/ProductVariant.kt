@@ -2,8 +2,9 @@ package ru.aasmc.productservice.storage.model
 
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType
 import jakarta.persistence.*
-import ru.aasmc.productservice.dto.AttributeDto
+import ru.aasmc.productservice.dto.AttributeCollection
 import ru.aasmc.productservice.dto.ImageCollection
+import ru.aasmc.productservice.dto.SkuCollection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -17,18 +18,20 @@ class ProductVariant(
     var variantName: String,
     @Column(nullable = false)
     var price: BigDecimal,
-    var stock: Int,
     @org.hibernate.annotations.Type(JsonBinaryType::class)
-    @Column(columnDefinition = "jsonb", name = "attributes")
-    val attributes: MutableList<AttributeDto>,
+    @Column(columnDefinition = "jsonb", name = "attribute_collection")
+    var attributeCollection: AttributeCollection = AttributeCollection(),
     @org.hibernate.annotations.Type(JsonBinaryType::class)
-    @Column(columnDefinition = "jsonb", name = "images")
-    var images: ImageCollection = ImageCollection(),
+    @Column(columnDefinition = "jsonb", name = "image_collection")
+    var imageCollection: ImageCollection = ImageCollection(),
+    @org.hibernate.annotations.Type(JsonBinaryType::class)
+    @Column(columnDefinition = "jsonb", name = "sku_collection")
+    var skuCollection: SkuCollection,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
 
-) {
+    ) {
 
     @Column(name = "created_at")
     @org.hibernate.annotations.CreationTimestamp
@@ -38,7 +41,7 @@ class ProductVariant(
     var updatedAt: LocalDateTime? = null
 
     override fun toString(): String {
-        return "ProductVariant(id=$id, price=$price, stock=$stock, attributes=$attributes, images=$images)"
+        return "ProductVariant(id=$id, price=$price, attributes=$attributeCollection, images=$imageCollection, skuCollection=$skuCollection)"
     }
 
     override fun equals(other: Any?): Boolean {

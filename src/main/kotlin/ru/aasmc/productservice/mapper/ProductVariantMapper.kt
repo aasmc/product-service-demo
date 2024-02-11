@@ -17,19 +17,19 @@ class ProductVariantMapper(
 ) {
 
     fun toDomain(dto: ProductVariantRequestDto, product: Product): ProductVariant {
-        val names = dto.attributes.map { it.attributeName }.toSet()
+        val names = dto.attributeCollection.attributes.map { it.attributeName }.toSet()
         val attrCount = attributeRepository.countByNameIn(names)
-        if (attrCount != dto.attributes.size.toLong()) {
+        if (attrCount != dto.attributeCollection.attributes.size.toLong()) {
             val msg = "Cannot create product variant, because not all attributes exist."
             throw ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
         }
         return ProductVariant(
             variantName = dto.variantName,
             price = dto.price,
-            stock = dto.stock,
-            attributes = dto.attributes.toMutableList(),
-            images = dto.images,
-            product = product
+            attributeCollection = dto.attributeCollection,
+            imageCollection = dto.images,
+            product = product,
+            skuCollection = dto.skuCollection
         )
     }
 
@@ -39,10 +39,10 @@ class ProductVariantMapper(
             variantId = cryptoTool.hashOf(domain.id!!),
             variantName = domain.variantName,
             price = domain.price,
-            stock = domain.stock,
-            attributes = domain.attributes,
-            images = domain.images,
-            createdAt = domain.createdAt!!
+            attributesCollection = domain.attributeCollection,
+            images = domain.imageCollection,
+            createdAt = domain.createdAt!!,
+            skuCollection = domain.skuCollection
         )
 
 

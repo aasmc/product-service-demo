@@ -1,5 +1,5 @@
 package ru.aasmc.productservice.dto
 
 data class ImageCollection(
-    val images: MutableList<AppImage> = arrayListOf()
+    val images: MutableSet<AppImage> = hashSetOf()
 )

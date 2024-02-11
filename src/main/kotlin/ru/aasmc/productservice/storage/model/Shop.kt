@@ -15,7 +15,7 @@ class Shop(
     var seller: Seller,
     var name: String,
     var description: String,
-    @OneToMany(mappedBy = "shop")
+    @OneToMany(mappedBy = "shop", cascade = [CascadeType.PERSIST])
     @org.hibernate.annotations.BatchSize(size = 10)
     val products: MutableSet<Product> = hashSetOf(),
 

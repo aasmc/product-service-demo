@@ -5,6 +5,7 @@ const val BASE_ATTRIBUTES_URL = "/v1/attributes"
 const val BASE_SELLERS_URL = "/v1/sellers"
 const val BASE_SHOPS_URL = "/v1/shops"
 const val BASE_PRODUCTS_URL = "/v1/products"
+const val BASE_PRODUCT_VARIANTS_URL = "/v1/product-variants"
 
 const val TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME = "Clothes"
 const val TEST_SUBCATEGORY_T_SHIRTS_NAME = "T-Shirts"
@@ -23,6 +24,11 @@ const val SIZE_48_VALUE = "48"
 const val SIZE_50_VALUE = "50"
 const val SIZE_52_VALUE = "52"
 const val SIZE_54_VALUE = "54"
+const val BLUE_T_SHIRT_XS_SKU = "t-shirt/blue/XS/Brand/230"
+const val BLUE_T_SHIRT_S_SKU = "t-shirt/blue/S/Brand/231"
+const val BLUE_T_SHIRT_M_SKU = "t-shirt/blue/M/Brand/232"
+const val BLUE_T_SHIRT_VARIANT_NAME = "T-Shirt Blue"
+const val OLD_BLUE_IMAGE_URL = "http://images.com/old_blue_image.png"
 
 const val DIMENS_ATTR_NAME = "clothes dimensions"
 const val DIMENS_ATTR_SHORT_NAME = "dimensions"
@@ -59,4 +65,25 @@ const val BLUE = "blue"
 const val GREEN = "green"
 
 const val COLOR_ATTR_NAME = "color"
+const val COLOR_ATTR_ID = "colorAttrId"
+const val COLOR_COMPOSITE_ATTR_ID = "colorCompositeAttrId"
+const val COLOR_COMPOSITE_ATTR_NAME = "Color Composite name"
+const val COLOR_COMPOSITE_SUB_ATTR_ID = "colorCompositeSubAttrId"
+const val COLOR_SHADE_ATTR_NAME = "Color Shade"
+
+const val STRING_ATTR_ID = "stringAttrId"
+const val STRING_COMPOSITE_ATTR_ID = "stringCompositeAttrId"
+const val STRING_COMPOSITE_SUB_ATTR_ID = "stringCompositeAttrId"
+const val STRING_COMPOSITE_ATTR_NAME = "String Composite attr name"
+const val STRING_SUBATTR_NAME = "A string attribute name"
+
+const val WEIGHT_ATTR_NAME = "weight"
+const val WEIGHT_ATTR_ID = "weightId"
+const val WEIGHT_VALUE_100 = 100.0
+const val WEIGHT_RU_VALUE_100 = 100.0
+const val WEIGHT_UNIT = "gram"
+const val WEIGHT_VALUE_200 = 200.0
+const val WEIGHT_RU_VALUE_200 = 200.0
+
+const val DIMENS_ATTR_ID = "dimensId"
 

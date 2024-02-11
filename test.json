@@ -1,0 +1,43 @@
+[
+  {
+    "id": "3GNB7XoWkd",
+    "attributeName": "clothes size",
+    "shortName": "size",
+    "isFaceted": true,
+    "type": "string",
+    "isRequired": true,
+    "createdAt": [
+      2024,
+      1,
+      28,
+      18,
+      11,
+      28,
+      181275000
+    ],
+    "availableValues": [
+      {
+        "stringValue": "XS",
+        "stringRuValue": "44",
+        "type": "string_type"
+      },
+      {
+        "stringValue": "S",
+        "stringRuValue": "46",
+        "type": "string_type"
+      },
+      {
+        "stringValue": "M",
+        "stringRuValue": "48",
+        "type": "string_type"
+      }
+    ]
+  },
+  {
+    "id": "KqwBRJB84R",
+    "attributeName": "color",
+    "shortName": "color",
+    "isFaceted": true,
+    "type": "color",
+    "isRequired": false,
+    "createdAt":

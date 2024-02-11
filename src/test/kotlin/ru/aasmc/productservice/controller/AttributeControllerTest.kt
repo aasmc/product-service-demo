@@ -21,10 +21,10 @@ class AttributeControllerTest @Autowired constructor(
 ) : BaseIntegTest() {
 
     @Test
-    fun addValueToCompositeAttributeValue_addsValueToExistingComposite() {
+    fun addValueToCompositeAttribute_addsValueToExistingComposite() {
         var attr = dimensAttributeDomain()
         attr = attributeRepository.save(attr)
-        val width = attr.compositeAttributeValues.first { it.name == DIMENS_WIDTH_NAME }
+        val width = attr.subAttributes.first { it.name == DIMENS_WIDTH_NAME }
 
         val newValue = NumericAttributeValueDto(
             numValue = 40.0,
@@ -33,7 +33,7 @@ class AttributeControllerTest @Autowired constructor(
         )
         webTestClient
             .put()
-            .uri("$BASE_ATTRIBUTES_URL/compositeValue/${cryptoTool.hashOf(width.id!!)}/value")
+            .uri("$BASE_ATTRIBUTES_URL/${cryptoTool.hashOf(width.id!!)}/value")
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(newValue)
             .exchange()
@@ -47,53 +47,6 @@ class AttributeControllerTest @Autowired constructor(
             }
     }
 
-    @Test
-    fun addCompositeAttributeValue_addsValueToExistingAttribute() {
-        var attr = dimensAttributeDomain()
-        attr = attributeRepository.save(attr)
-
-        val newValue = CompositeAttributeValueDto(
-            name = "radius",
-            values = listOf(
-                NumericAttributeValueDto(
-                    numValue = 10.0,
-                    numRuValue = null,
-                    numUnit = "m"
-                )
-            )
-        )
-
-        webTestClient.put()
-            .uri("$BASE_ATTRIBUTES_URL/${cryptoTool.hashOf(attr.id!!)}/compositeValue")
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(newValue)
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(CompositeAttributeValueDto::class.java)
-            .value { response ->
-                assertThat(response.name).isEqualTo(newValue.name)
-                assertThat(response.values.size).isEqualTo(newValue.values.size)
-            }
-
-        webTestClient.get()
-            .uri("$BASE_ATTRIBUTES_URL/${attr.name}")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(AttributeDto::class.java)
-            .value { dto ->
-                dto as CompositeAttributeDto
-                val values = dto.availableValues
-                assertThat(values.size).isEqualTo(attr.compositeAttributeValues.size + 1)
-                val radius = values
-                    .first { it.name == newValue.name }
-                assertThat(radius.name).isEqualTo(newValue.name)
-                assertThat(radius.values.size).isEqualTo(1)
-                val radiusValue = radius.values[0] as NumericAttributeValueDto
-                assertThat(radiusValue.numRuValue).isNull()
-                assertThat(radiusValue.numValue).isEqualTo(10.0)
-            }
-    }
 
     @Test
     fun addAttributeValue_addsValueToExistingAttribute() {
@@ -112,7 +65,10 @@ class AttributeControllerTest @Autowired constructor(
             .expectStatus().isOk
             .expectBody(AttributeValueDto::class.java)
             .value { value ->
-                assertThat(value.id).isNotNull()
+                value as StringAttributeValueDto
+                assertThat(value).isNotNull()
+                assertThat(value.stringValue).isEqualTo(newValue.stringValue)
+                assertThat(value.stringRuValue).isEqualTo(newValue.stringRuValue)
             }
 
         webTestClient.get()
@@ -122,8 +78,8 @@ class AttributeControllerTest @Autowired constructor(
             .expectStatus().isOk
             .expectBody(AttributeDto::class.java)
             .value { attribute ->
-                val size = attribute as PlainAttributeDto
-                assertThat(size.availableValues).hasSize(attr.attributeValues.size + 1)
+                val size = attribute as StringAttributeDto
+                assertThat(size.availableValues).hasSize(attr.stringValues.size + 1)
                 val result = size.availableValues.filterIsInstance<StringAttributeValueDto>()
                     .first { it.stringValue == newValue.stringValue }
                 assertThat(result.stringValue).isEqualTo(newValue.stringValue)
@@ -137,7 +93,7 @@ class AttributeControllerTest @Autowired constructor(
         var attr = sizeAttributeDomain()
         category = categoryRepository.save(category)
         attr = attributeRepository.save(attr)
-        var cAttr = CategoryAttribute(true, category, attr)
+        val cAttr = CategoryAttribute(true, category, attr)
         categoryAttributeRepository.save(cAttr)
 
         webTestClient.get()
@@ -149,9 +105,9 @@ class AttributeControllerTest @Autowired constructor(
             .value { collection ->
                 val attrs = collection.attributes
                 assertThat(attrs).hasSize(1)
-                val size = attrs[0] as PlainAttributeDto
+                val size = attrs[0] as StringAttributeDto
                 assertThat(size.attributeName).isEqualTo(attr.name)
-                assertThat(size.availableValues).hasSize(attr.attributeValues.size)
+                assertThat(size.availableValues).hasSize(attr.stringValues.size)
             }
     }
 
@@ -169,7 +125,7 @@ class AttributeControllerTest @Autowired constructor(
             .value { response ->
                 val dimenAttr = response as CompositeAttributeDto
                 assertThat(dimenAttr.attributeName).isEqualTo(DIMENS_ATTR_NAME)
-                assertThat(dimenAttr.availableValues).hasSize(3)
+                assertThat(dimenAttr.subAttributes).hasSize(3)
             }
     }
 
@@ -185,7 +141,7 @@ class AttributeControllerTest @Autowired constructor(
             .expectStatus().isCreated
             .expectBody(AttributeDto::class.java)
             .value { response ->
-                val sizeAttr = response as PlainAttributeDto
+                val sizeAttr = response as StringAttributeDto
                 assertThat(sizeAttr.id).isNotNull()
                 assertThat(sizeAttr.attributeName).isEqualTo(CLOTHES_SIZE_ATTR_NAME)
                 assertThat(sizeAttr.shortName).isEqualTo(CLOTHES_SIZE_ATTR_SHORT_NAME)

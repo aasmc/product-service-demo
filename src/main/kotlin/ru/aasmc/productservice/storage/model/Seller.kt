@@ -14,7 +14,7 @@ class Seller(
     var firstName: String,
     @Column(name = "last_name", nullable = false)
     var lastName: String,
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(mappedBy = "seller", cascade = [CascadeType.PERSIST])
     @BatchSize(size = 10)
     val shops: MutableSet<Shop> = hashSetOf(),
     @Column(name = "created_at")

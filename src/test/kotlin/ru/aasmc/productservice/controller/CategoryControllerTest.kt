@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import ru.aasmc.productservice.BaseIntegTest
-import ru.aasmc.productservice.dto.CategoryResponse
-import ru.aasmc.productservice.dto.CompositeAttributeDto
-import ru.aasmc.productservice.dto.PlainAttributeDto
-import ru.aasmc.productservice.dto.SelectedAttribute
+import ru.aasmc.productservice.dto.*
+import ru.aasmc.productservice.storage.model.NumericAttribute
 import ru.aasmc.productservice.storage.repository.AttributeRepository
 import ru.aasmc.productservice.storage.repository.CategoryRepository
 import ru.aasmc.productservice.testdata.*
@@ -38,19 +36,19 @@ class CategoryControllerTest @Autowired constructor (
             .value { response ->
                 assertThat(response.attributes).hasSize(1)
                 val dimensAttr = response.attributes[0] as CompositeAttributeDto
-                assertThat(dimensAttr.availableValues).hasSize(3)
+                assertThat(dimensAttr.subAttributes).hasSize(3)
                 assertThat(dimensAttr.isRequired).isTrue()
-                val dimenValues = dimensAttr.availableValues
-                    .sortedBy { it.name }
-                val depth = dimenValues[0]
-                val length = dimenValues[1]
-                val width = dimenValues[2]
-                assertThat(depth.name).isEqualTo(DIMENS_DEPTH_NAME)
-                assertThat(depth.values).hasSize(3)
-                assertThat(width.name).isEqualTo(DIMENS_WIDTH_NAME)
-                assertThat(width.values).hasSize(3)
-                assertThat(length.name).isEqualTo(DIMENS_LENGTH_NAME)
-                assertThat(length.values).hasSize(3)
+                val dimenValues = dimensAttr.subAttributes
+                    .sortedBy { it.attributeName }
+                val depth = dimenValues[0] as NumericAttributeDto
+                val length = dimenValues[1] as NumericAttributeDto
+                val width = dimenValues[2] as NumericAttributeDto
+                assertThat(depth.attributeName).isEqualTo(DIMENS_DEPTH_NAME)
+                assertThat(depth.availableValues).hasSize(3)
+                assertThat(width.attributeName).isEqualTo(DIMENS_WIDTH_NAME)
+                assertThat(width.availableValues).hasSize(3)
+                assertThat(length.attributeName).isEqualTo(DIMENS_LENGTH_NAME)
+                assertThat(length.availableValues).hasSize(3)
             }
     }
 
@@ -75,7 +73,7 @@ class CategoryControllerTest @Autowired constructor (
             .expectBody(CategoryResponse::class.java)
             .value { response ->
                 assertThat(response.attributes).hasSize(1)
-                val size = response.attributes[0] as PlainAttributeDto
+                val size = response.attributes[0] as StringAttributeDto
                 assertThat(size.id).isNotNull()
                 assertThat(size.attributeName).isEqualTo(CLOTHES_SIZE_ATTR_NAME)
                 assertThat(size.availableValues).hasSize(6)
@@ -109,25 +107,25 @@ class CategoryControllerTest @Autowired constructor (
                 assertThat(response.attributes).hasSize(2)
                 val sortedAttrs = response.attributes.sortedBy { it.attributeName }
                 val dimensAttr = sortedAttrs[0] as CompositeAttributeDto
-                val sizeAttr = sortedAttrs[1] as PlainAttributeDto
+                val sizeAttr = sortedAttrs[1] as StringAttributeDto
                 assertThat(dimensAttr.attributeName).isEqualTo(DIMENS_ATTR_NAME)
-                assertThat(dimensAttr.availableValues).hasSize(3)
+                assertThat(dimensAttr.subAttributes).hasSize(3)
                 assertThat(dimensAttr.isRequired).isTrue()
                 assertThat(sizeAttr.attributeName).isEqualTo(CLOTHES_SIZE_ATTR_NAME)
                 assertThat(sizeAttr.availableValues).hasSize(6)
                 assertThat(sizeAttr.isRequired).isTrue()
 
-                val dimenValues = dimensAttr.availableValues
-                    .sortedBy { it.name }
-                val depth = dimenValues[0]
-                val length = dimenValues[1]
-                val width = dimenValues[2]
-                assertThat(depth.name).isEqualTo(DIMENS_DEPTH_NAME)
-                assertThat(depth.values).hasSize(3)
-                assertThat(width.name).isEqualTo(DIMENS_WIDTH_NAME)
-                assertThat(width.values).hasSize(3)
-                assertThat(length.name).isEqualTo(DIMENS_LENGTH_NAME)
-                assertThat(length.values).hasSize(3)
+                val dimenValues = dimensAttr.subAttributes
+                    .sortedBy { it.attributeName }
+                val depth = dimenValues[0] as NumericAttributeDto
+                val length = dimenValues[1] as NumericAttributeDto
+                val width = dimenValues[2] as NumericAttributeDto
+                assertThat(depth.attributeName).isEqualTo(DIMENS_DEPTH_NAME)
+                assertThat(depth.availableValues).hasSize(3)
+                assertThat(width.attributeName).isEqualTo(DIMENS_WIDTH_NAME)
+                assertThat(width.availableValues).hasSize(3)
+                assertThat(length.attributeName).isEqualTo(DIMENS_LENGTH_NAME)
+                assertThat(length.availableValues).hasSize(3)
             }
 
         webTestClient.get()
