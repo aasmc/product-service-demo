@@ -27,12 +27,12 @@ class JsonbOpsProductVariantServiceImpl(
 ) : ProductVariantService {
     override fun updateSkuStock(dto: UpdateSkuStockRequest): UpdateSkuStockResponse {
         val variantId = cryptoTool.idOf(dto.productVariantId)
-        checkVariantExists(variantId, dto.productVariantId)
-        productVariantRepository.updateSkuStock(
+        val count = productVariantRepository.updateSkuStock(
             sku = dto.sku,
             variantId = variantId,
             newStock = dto.newStock
         )
+        checkUpdateCount(count, dto.productVariantId)
         updateOutboxService.saveUpdateSkuStockEvent(
             variantId, dto.sku, dto.newStock
         )
@@ -45,12 +45,12 @@ class JsonbOpsProductVariantServiceImpl(
 
     override fun updateSkuPrice(dto: UpdateSkuPriceDto): UpdateSkuPriceResponse {
         val variantId = cryptoTool.idOf(dto.productVariantId)
-        checkVariantExists(variantId, dto.productVariantId)
-        productVariantRepository.updateSkuPrice(
+        val count = productVariantRepository.updateSkuPrice(
             sku = dto.sku,
             variantId = variantId,
             newPrice = dto.newPrice
         )
+        checkUpdateCount(count, dto.productVariantId)
         updateOutboxService.saveUpdateSkuPriceEvent(variantId, dto.sku, dto.newPrice)
         log.info("Successfully updated Sku price: {}", dto)
         return UpdateSkuPriceResponse(
@@ -87,8 +87,8 @@ class JsonbOpsProductVariantServiceImpl(
 
     override fun addVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        productVariantRepository.addImage(id, om.writeValueAsString(photo))
+        val count = productVariantRepository.addImage(id, om.writeValueAsString(photo))
+        checkUpdateCount(count, variantId)
         log.info("Successfully added new photo {} to product variant with ID={}", photo, id)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVPhotosEvent(
@@ -99,8 +99,8 @@ class JsonbOpsProductVariantServiceImpl(
 
     override fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        productVariantRepository.removeImage(id, photo.url)
+        val count = productVariantRepository.removeImage(id, photo.url)
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVPhotosEvent(id, updated.imageCollection)
         log.info("Successfully removed photo {} from product variant with ID={}", photo, id)
@@ -109,12 +109,12 @@ class JsonbOpsProductVariantServiceImpl(
 
     override fun addVariantAttribute(variantId: String, attribute: AttributeDto): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        productVariantRepository.addOrReplaceVariantAttribute(
+        val count = productVariantRepository.addOrReplaceVariantAttribute(
             variantId = id,
             attrString = om.writeValueAsString(attribute),
             attrName = attribute.attributeName
         )
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
@@ -126,11 +126,11 @@ class JsonbOpsProductVariantServiceImpl(
 
     override fun removeVariantAttribute(variantId: String, attributeName: String): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        productVariantRepository.removeVariantAttribute(
+        val count = productVariantRepository.removeVariantAttribute(
             variantId = id,
             attrName = attributeName
         )
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
@@ -147,13 +147,13 @@ class JsonbOpsProductVariantServiceImpl(
         value: AttributeValueDto
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        productVariantRepository.addCompositeAttributeValue(
+        val count = productVariantRepository.addCompositeAttributeValue(
             variantId = id,
             attrName = attributeName,
             subAttrName = subAttributeName,
             valueString = om.writeValueAsString(value)
         )
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
@@ -169,12 +169,12 @@ class JsonbOpsProductVariantServiceImpl(
         value: AttributeValueDto
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        productVariantRepository.addAttributeValue(
+        val count = productVariantRepository.addAttributeValue(
             id,
             attributeName,
             om.writeValueAsString(value)
         )
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
@@ -190,8 +190,7 @@ class JsonbOpsProductVariantServiceImpl(
         value: AttributeValueDto
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        when (value) {
+        val count = when (value) {
             is ColorAttributeValueDto -> {
                 productVariantRepository.removeColorAttributeValue(
                     id,
@@ -217,6 +216,7 @@ class JsonbOpsProductVariantServiceImpl(
                 )
             }
         }
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
@@ -233,8 +233,7 @@ class JsonbOpsProductVariantServiceImpl(
         value: AttributeValueDto
     ): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        checkVariantExists(id, variantId)
-        when (value) {
+        val count = when (value) {
             is ColorAttributeValueDto -> {
                 productVariantRepository.removeCompositeAttributeColorValue(
                     id,
@@ -262,6 +261,7 @@ class JsonbOpsProductVariantServiceImpl(
                 )
             }
         }
+        checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVAttributesEvent(id, updated.attributeCollection)
         log.info(
@@ -292,6 +292,22 @@ class JsonbOpsProductVariantServiceImpl(
         if (productVariantRepository.getIdIfPresent(id) == null) {
             val msg = "ProductVariant with ID=$idStr not found."
             throw ProductServiceException(msg, HttpStatus.NOT_FOUND.value())
+        }
+    }
+
+    private fun checkUpdateCount(count: Int, idStr: String) {
+        var msg: String? = null
+        var status: Int? = null
+        if (count == 0) {
+            msg = "Product Variant with ID=$idStr not found."
+            status = HttpStatus.NOT_FOUND.value()
+
+        } else if (count > 1) {
+            msg = "Database error. Database contains more than one row in Table product_variants for Product Variant with ID=$idStr."
+            status = HttpStatus.INTERNAL_SERVER_ERROR.value()
+        }
+        if (msg != null) {
+            throw ProductServiceException(msg, status!!)
         }
     }
 

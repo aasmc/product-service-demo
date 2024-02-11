@@ -40,7 +40,7 @@ values ('T-Shirt Blue', 1,
               }
             ]
   }', 10),
-('Red T-Shirt variant', 1, '{"attributes":[]}',
+('Red T-Shirt variant', 1, '{"attributes":[{"id":"colorAttrId","attributeName":"color","shortName":"color","isFaceted":true,"type":"color","isRequired":true,"availableValues":[]}]}',
      '{"images":
       [
           {"url":"http://images.com/old_red_image.png","isPrimary":true}

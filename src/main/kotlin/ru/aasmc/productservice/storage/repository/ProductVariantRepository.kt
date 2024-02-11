@@ -17,8 +17,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
     @Modifying
     @Query("""
         WITH attr_path AS (
-            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
-            CAST((index - 1) AS INTEGER) AS idx 
+            SELECT CAST((index - 1) AS INTEGER) AS idx 
             FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
             WHERE id = :variantId AND elem->>'attributeName' = :attrName
         ),
@@ -48,13 +47,12 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("attrName") attrName: String,
         @Param("subAttrName") subAttrName: String,
         @Param("colorValue") colorValue: String,
-    )
+    ): Int
 
     @Modifying
     @Query("""
         WITH attr_path AS (
-            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
-            CAST((index - 1) AS INTEGER) AS idx 
+            SELECT CAST((index - 1) AS INTEGER) AS idx 
             FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
             WHERE id = :variantId AND elem->>'attributeName' = :attrName
         ),
@@ -84,14 +82,13 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("attrName") attrName: String,
         @Param("subAttrName") subAttrName: String,
         @Param("stringValue") stringValue: String,
-    )
+    ): Int
 
 
     @Modifying
     @Query("""
         WITH attr_path AS (
-            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
-            CAST((index - 1) AS INTEGER) AS idx 
+            SELECT CAST((index - 1) AS INTEGER) AS idx 
             FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
             WHERE id = :variantId AND elem->>'attributeName' = :attrName
         ),
@@ -121,7 +118,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("attrName") attrName: String,
         @Param("subAttrName") subAttrName: String,
         @Param("numValue") numValue: Double,
-    )
+    ): Int
 
     @Modifying
     @Query("""
@@ -150,7 +147,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("variantId") variantId: Long,
         @Param("attrName") attrName: String,
         @Param("numValue") numValue: Double,
-    )
+    ): Int
 
     @Modifying
     @Query("""
@@ -179,7 +176,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("variantId") variantId: Long,
         @Param("attrName") attrName: String,
         @Param("stringValue") stringValue: String,
-    )
+    ): Int
 
     @Modifying
     @Query("""
@@ -210,13 +207,12 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("attrName") attrName: String,
         @Param("colorValue") colorValue: String,
         @Param("colorHex") colorHex: String
-    )
+    ): Int
 
     @Modifying
     @Query("""
         WITH attr_path AS (
-            SELECT ('{attributes,'||index - 1||',availableValues}')\:\:text[] AS path,
-            CAST((index - 1) AS INTEGER) AS idx 
+            SELECT CAST((index - 1) AS INTEGER) AS idx 
             FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
             WHERE id = :variantId AND elem->>'attributeName' = :attrName
         ),
@@ -238,10 +234,10 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
     """, nativeQuery = true)
     fun addCompositeAttributeValue(
         @Param("variantId") variantId: Long,
-        @Param("attrName") attrName: String,
-        @Param("subAttrName") subAttrName: String,
+        @Param("attrName") attrName: String, // name of the composite
+        @Param("subAttrName") subAttrName: String, // name of the sub attribute
         @Param("valueStr") valueString: String
-    )
+    ): Int
 
     @Modifying
     @Query("""
@@ -265,7 +261,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("variantId") variantId: Long,
         @Param("attrName") attrName: String,
         @Param("valueStr") valueString: String
-    )
+    ): Int
 
     @Modifying
     @Query(
@@ -288,7 +284,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
     fun removeVariantAttribute(
         @Param("variantId") variantId: Long,
         @Param("attrName") attrName: String
-    )
+    ): Int
 
     @Modifying
     @Query(
@@ -312,7 +308,7 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("variantId") variantId: Long,
         @Param("attrStr") attrString: String,
         @Param("attrName") attrName: String
-    )
+    ): Int
 
     @Modifying
     @Query(
@@ -331,7 +327,10 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         WHERE id = :variantId
     """, nativeQuery = true
     )
-    fun removeImage(@Param("variantId") variantId: Long, @Param("imageUrl") imageUrl: String)
+    fun removeImage(
+        @Param("variantId") variantId: Long,
+        @Param("imageUrl") imageUrl: String
+    ): Int
 
     @Modifying
     @Query(
@@ -341,7 +340,10 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         WHERE id = :variantId
     """, nativeQuery = true
     )
-    fun addImage(@Param("variantId") variantId: Long, @Param("photo") photo: String)
+    fun addImage(
+        @Param("variantId") variantId: Long,
+        @Param("photo") photo: String
+    ): Int
 
     @Modifying
     @Query(
@@ -357,7 +359,11 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         WHERE id = :variantId
 """, nativeQuery = true
     )
-    fun updateSkuStock(@Param("sku") sku: String, @Param("variantId") variantId: Long, @Param("newStock") newStock: Int)
+    fun updateSkuStock(
+        @Param("sku") sku: String,
+        @Param("variantId") variantId: Long,
+        @Param("newStock") newStock: Int
+    ): Int
 
     @Modifying
     @Query(
@@ -377,6 +383,6 @@ interface ProductVariantRepository : JpaRepository<ProductVariant, Long> {
         @Param("sku") sku: String,
         @Param("variantId") variantId: Long,
         @Param("newPrice") newPrice: BigDecimal
-    )
+    ): Int
 
 }
