@@ -96,6 +96,7 @@ data class UpdateProductDescription(
 
 
 enum class SkuUpdateReason(
+    @field:JsonValue
     val reasonName: String
 ) {
     UPDATE_STOCK("stock"),

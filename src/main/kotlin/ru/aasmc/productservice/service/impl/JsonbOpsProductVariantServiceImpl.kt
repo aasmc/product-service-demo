@@ -43,7 +43,7 @@ class JsonbOpsProductVariantServiceImpl(
         )
     }
 
-    override fun updateSkuPrice(dto: UpdateSkuPriceDto): UpdateSkuPriceResponse {
+    override fun updateSkuPrice(dto: UpdateSkuPriceRequest): UpdateSkuPriceResponse {
         val variantId = cryptoTool.idOf(dto.productVariantId)
         val count = productVariantRepository.updateSkuPrice(
             sku = dto.sku,
@@ -59,7 +59,7 @@ class JsonbOpsProductVariantServiceImpl(
         )
     }
 
-    override fun updateVariantPrice(dto: UpdateProductVariantPriceDto): ProductVariantResponse {
+    override fun updateVariantPrice(dto: UpdateProductVariantPriceRequest): ProductVariantResponse {
         val id = cryptoTool.idOf(dto.productVariantId)
         val updated = updateProductVariant(dto.productVariantId, id) { variant ->
             variant.price = dto.newPrice
@@ -97,13 +97,13 @@ class JsonbOpsProductVariantServiceImpl(
         return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
-    override fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
+    override fun removeVariantPhoto(variantId: String, photoUrl: String): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
-        val count = productVariantRepository.removeImage(id, photo.url)
+        val count = productVariantRepository.removeImage(id, photoUrl)
         checkUpdateCount(count, variantId)
         val updated = getProductVariantOrThrow(variantId, id)
         updateOutboxService.saveUpdatePVPhotosEvent(id, updated.imageCollection)
-        log.info("Successfully removed photo {} from product variant with ID={}", photo, id)
+        log.info("Successfully removed photo {} from product variant with ID={}", photoUrl, id)
         return productVariantMapper.toProductVariantFullResponse(updated)
     }
 
@@ -299,7 +299,7 @@ class JsonbOpsProductVariantServiceImpl(
         var msg: String? = null
         var status: Int? = null
         if (count == 0) {
-            msg = "Product Variant with ID=$idStr not found."
+            msg = "Either Product Variant with ID=$idStr not found or some of its attributes meant to be updated are not included in the product variant."
             status = HttpStatus.NOT_FOUND.value()
 
         } else if (count > 1) {

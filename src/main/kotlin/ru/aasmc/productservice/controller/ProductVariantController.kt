@@ -6,7 +6,7 @@ import ru.aasmc.productservice.dto.*
 import ru.aasmc.productservice.service.ProductVariantService
 
 @RestController
-@RequestMapping("/product-variant")
+@RequestMapping("/v1/product-variants")
 class ProductVariantController(
     private val productVariantService: ProductVariantService
 ) {
@@ -18,13 +18,13 @@ class ProductVariantController(
     }
 
     @PatchMapping("/sku-price")
-    fun updateSkuPrice(@RequestBody dto: UpdateSkuPriceDto): UpdateSkuPriceResponse {
+    fun updateSkuPrice(@RequestBody dto: UpdateSkuPriceRequest): UpdateSkuPriceResponse {
         log.info("Received PATCH request to update sku price: {}", dto)
         return productVariantService.updateSkuPrice(dto)
     }
 
     @PatchMapping("/price")
-    fun updateVariantPrice(dto: UpdateProductVariantPriceDto): ProductVariantResponse {
+    fun updateVariantPrice(@RequestBody dto: UpdateProductVariantPriceRequest): ProductVariantResponse {
         log.info("Received PATCH request to update product variant price: {}", dto)
         return productVariantService.updateVariantPrice(dto)
     }
@@ -56,13 +56,13 @@ class ProductVariantController(
     @DeleteMapping("/{id}/photo")
     fun deleteVariantPhoto(
         @PathVariable("id") variantId: String,
-        @RequestBody photo: AppImage,
+        @RequestParam("photoUrl") photoUrl: String,
     ): ProductVariantResponse {
         log.info(
             "Received request to DELETE photo: {} from product variant with ID={}",
-            photo, variantId
+            photoUrl, variantId
         )
-        return productVariantService.removeVariantPhoto(variantId, photo)
+        return productVariantService.removeVariantPhoto(variantId, photoUrl)
     }
 
     @PatchMapping("/{id}/attribute")
@@ -116,7 +116,7 @@ class ProductVariantController(
         return productVariantService.addValueToCompositeAttribute(variantId, attributeName, subAttributeName, value)
     }
 
-    @DeleteMapping("/{id}/attribute-value")
+    @PatchMapping("/{id}/attribute-value-delete")
     fun deleteAttributeValue(
         @PathVariable("id") variantId: String,
         @RequestBody value: AttributeValueDto,
@@ -129,7 +129,7 @@ class ProductVariantController(
         return productVariantService.removeAttributeValue(variantId, attributeName, value)
     }
 
-    @DeleteMapping("/{id}/composite-attribute-value")
+    @PatchMapping("/{id}/composite-attribute-value-delete")
     fun deleteCompositeAttributeValue(
         @PathVariable("id") variantId: String,
         @RequestBody value: AttributeValueDto,

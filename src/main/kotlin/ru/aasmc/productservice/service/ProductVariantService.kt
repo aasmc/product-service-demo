@@ -6,15 +6,15 @@ interface ProductVariantService {
 
     fun updateSkuStock(dto: UpdateSkuStockRequest): UpdateSkuStockResponse
 
-    fun updateSkuPrice(dto: UpdateSkuPriceDto): UpdateSkuPriceResponse
+    fun updateSkuPrice(dto: UpdateSkuPriceRequest): UpdateSkuPriceResponse
 
-    fun updateVariantPrice(dto: UpdateProductVariantPriceDto): ProductVariantResponse
+    fun updateVariantPrice(dto: UpdateProductVariantPriceRequest): ProductVariantResponse
 
     fun updateVariantName(variantId: String, newName: String): ProductVariantResponse
 
     fun addVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse
 
-    fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse
+    fun removeVariantPhoto(variantId: String, photoUrl: String): ProductVariantResponse
 
     fun addVariantAttribute(variantId: String, attribute: AttributeDto): ProductVariantResponse
 

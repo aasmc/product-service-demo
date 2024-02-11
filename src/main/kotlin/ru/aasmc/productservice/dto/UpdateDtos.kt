@@ -13,7 +13,7 @@ data class UpdateSkuStockResponse(
     val newStock: Int
 )
 
-data class UpdateSkuPriceDto(
+data class UpdateSkuPriceRequest(
     val productVariantId: String,
     val sku: String,
     val newPrice: BigDecimal
@@ -24,7 +24,7 @@ data class UpdateSkuPriceResponse(
     val newPrice: BigDecimal
 )
 
-data class UpdateProductVariantPriceDto(
+data class UpdateProductVariantPriceRequest(
     val productVariantId: String,
     val newPrice: BigDecimal
 )

@@ -37,7 +37,7 @@ class InAppProductVariantServiceImpl(
         )
     }
 
-    override fun updateSkuPrice(dto: UpdateSkuPriceDto): UpdateSkuPriceResponse {
+    override fun updateSkuPrice(dto: UpdateSkuPriceRequest): UpdateSkuPriceResponse {
         val id = cryptoTool.idOf(dto.productVariantId)
         updateProductVariantSku(dto.productVariantId, id) { sku ->
             if (sku.sku == dto.sku) sku.copy(price = dto.newPrice) else sku
@@ -50,7 +50,7 @@ class InAppProductVariantServiceImpl(
         )
     }
 
-    override fun updateVariantPrice(dto: UpdateProductVariantPriceDto): ProductVariantResponse {
+    override fun updateVariantPrice(dto: UpdateProductVariantPriceRequest): ProductVariantResponse {
         val id = cryptoTool.idOf(dto.productVariantId)
         val updated = updateProductVariant(dto.productVariantId, id) { variant ->
             variant.price = dto.newPrice
@@ -85,16 +85,16 @@ class InAppProductVariantServiceImpl(
         return productVariantMapper.toProductVariantFullResponse(variant)
     }
 
-    override fun removeVariantPhoto(variantId: String, photo: AppImage): ProductVariantResponse {
+    override fun removeVariantPhoto(variantId: String, photoUrl: String): ProductVariantResponse {
         val id = cryptoTool.idOf(variantId)
         val variant = getProductVariantOrThrow(variantId, id)
-        val removed = variant.imageCollection.images.remove(photo)
+        val removed = variant.imageCollection.images.removeIf { it.url == photoUrl }
         if (removed) {
-            log.info("Successfully removed photo {} from product variant with ID={}", photo, variant.id)
+            log.info("Successfully removed photo {} from product variant with ID={}", photoUrl, variant.id)
         } else {
             log.info(
                 "Failed to remove photo {} from product variant with ID={} because such photo doesn't exist.",
-                photo, variant.id
+                photoUrl, variant.id
             )
         }
         productVariantRepository.save(variant)

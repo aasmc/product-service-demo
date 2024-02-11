@@ -5,6 +5,7 @@ const val BASE_ATTRIBUTES_URL = "/v1/attributes"
 const val BASE_SELLERS_URL = "/v1/sellers"
 const val BASE_SHOPS_URL = "/v1/shops"
 const val BASE_PRODUCTS_URL = "/v1/products"
+const val BASE_PRODUCT_VARIANTS_URL = "/v1/product-variants"
 
 const val TEST_TOP_LEVEL_CLOTHES_CATEGORY_NAME = "Clothes"
 const val TEST_SUBCATEGORY_T_SHIRTS_NAME = "T-Shirts"
