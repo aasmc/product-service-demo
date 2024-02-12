@@ -62,7 +62,7 @@ data class StringAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    override val availableValues: MutableList<StringAttributeValueDto>,
+    override val availableValues: MutableList<StringAttributeValueDto> = mutableListOf(),
 ) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, availableValues)
 
 data class NumericAttributeDto(
@@ -76,7 +76,7 @@ data class NumericAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    override val availableValues: MutableList<NumericAttributeValueDto>,
+    override val availableValues: MutableList<NumericAttributeValueDto> = mutableListOf(),
 ) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, availableValues)
 
 data class ColorAttributeDto(
@@ -90,7 +90,7 @@ data class ColorAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    override val availableValues: MutableList<ColorAttributeValueDto>,
+    override val availableValues: MutableList<ColorAttributeValueDto> = mutableListOf(),
 ) : AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, availableValues)
 
 data class CompositeAttributeDto(
@@ -104,7 +104,7 @@ data class CompositeAttributeDto(
     override val isRequired: Boolean? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     override val createdAt: LocalDateTime? = null,
-    val subAttributes: List<AttributeDto>
+    val subAttributes: List<AttributeDto> = listOf()
 ): AttributeDto(id, attributeName, shortName, isFaceted, type, createdAt, isRequired, listOf())
 
 enum class AttributeValueType(
