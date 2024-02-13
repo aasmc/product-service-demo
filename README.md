@@ -266,7 +266,7 @@ data class CompositeAttributeDto(
 который позволяет уникально идентифицировать конкретную единицу хранения товара и отслеживать ее наличие 
 на складе.
 
-В нашем случае, каждый вариант товара будет иметь список артикулов, представленных вследующем виде:
+В нашем случае, каждый вариант товара будет иметь список артикулов, представленных в следующем виде:
 ```kotlin
 data class Sku(
     val attrValue: String,
@@ -341,7 +341,7 @@ CREATE TABLE category_attributes(
     attribute_id BIGINT REFERENCES attributes(id) NOT NULL,
     is_required BOOLEAN NOT NULL DEFAULT false,
     PRIMARY KEY(category_id, attribute_id)
-)
+);
 ```
 
 Для представления данных об атрибутах в коде используется иерархия, аналогичная той, которая применяется 
@@ -537,25 +537,25 @@ WITH sku_path AS (
 метод для обновления цены артикула.
 
 ```kotlin
-    @Modifying
-    @Query(
-        value = """
-                    WITH sku_path AS (
-                        SELECT ('{skus,'||index - 1||',price}')\:\:text[] AS path
-                        FROM product_variants, jsonb_array_elements(sku_collection->'skus') WITH ORDINALITY arr(sku_element, index)
-                        WHERE id = :variantId AND sku_element->>'sku' = :sku
-                    )
-                    UPDATE product_variants
-                    SET sku_collection = jsonb_set(sku_collection, sku_path.path, to_jsonb(:newPrice), false)
-                    FROM sku_path 
-                    WHERE id = :variantId
-""", nativeQuery = true
-    )
-    fun updateSkuPrice(
-        @Param("sku") sku: String,
-        @Param("variantId") variantId: Long,
-        @Param("newPrice") newPrice: BigDecimal
-    ): Int
+@Modifying
+@Query(
+  value = """
+          WITH sku_path AS (
+              SELECT ('{skus,'||index - 1||',price}')\:\:text[] AS path
+              FROM product_variants, jsonb_array_elements(sku_collection->'skus') WITH ORDINALITY arr(sku_element, index)
+              WHERE id = :variantId AND sku_element->>'sku' = :sku
+          )
+          UPDATE product_variants
+          SET sku_collection = jsonb_set(sku_collection, sku_path.path, to_jsonb(:newPrice), false)
+          FROM sku_path 
+          WHERE id = :variantId
+       """, nativeQuery = true
+)
+fun updateSkuPrice(
+  @Param("sku") sku: String,
+  @Param("variantId") variantId: Long,
+  @Param("newPrice") newPrice: BigDecimal
+): Int
 ```
 
 Обновление поля `stock` у конкретного артикула происхоит аналогичным образом. 
@@ -567,8 +567,8 @@ WITH sku_path AS (
 
 Допустим, сейчас храниться только одно фото в image_collection:
 ```json
-{"images":
-  [
+{
+  "images": [
     {"url":"http://images.com/old_blue_image.png","isPrimary":true}
   ]
 }
@@ -601,7 +601,7 @@ fun addImage(
 Первые две уже знакомы, `jsonb_agg` аггрегирует передаваемые значения в JSON список. 
 
 Логика удаления такая: проходим по каждому элементу списка, оставляем в нем только те элементы,
-которые не удовлетворяют условию удаления, аггрегируем их обратно в список. Но тут есть важный момент: 
+которые не удовлетворяют условию удаления, агрегируем их обратно в список. Но тут есть важный момент: 
 если после удаления в результирующем списке не останется элементов, то `jsonb_agg` вернет `NULL`, а нам 
 требуется сформировать пустой список, для этого воспользуемся функцией `COALESCE`, которая оставляет 
 первое не `NULL` значение. Первым параметром будет результат `jsonb_agg`, а вторым - пустой список. 
@@ -745,7 +745,7 @@ fun removeImage(
 }
 ```
 
-И нам необходимо удалить в атрибуте "clothes dimensions", в под-атрибуте "width" удалить значение "numValue" = 10.0.
+И нам необходимо в атрибуте "clothes dimensions", в под-атрибуте "width" удалить значение "numValue" = 10.0.
 Для того, чтобы это сделать, нам придется:
 1. Найти индекс атрибута с названием "clothes dimensions"
 ```sql
