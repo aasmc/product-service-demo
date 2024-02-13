@@ -2,9 +2,13 @@
 
 Демо проект, призванный продемонстрировать один из возможных вариантов хранения в Postgres
 данных о товарах, которые могут иметь различные атрибуты с различными значениями. 
+Изначально для хранения такой информации больше подходит NoSQL база, тем не менее бывают архитектуры,
+в которых оправдано использование реляционного хранилища. Например, в случае применения принципа 
+Command and Query Responsibility Segregation (CQRS) когда запись осуществляется в Postgres, а чтение
+происходит, допустим, из ElasticSearch, а данные между ними перемещаются по шине, реализованной на Kafka. 
 
 Чтобы увидеть, почему этот вопрос не нак прост, как кажется с первого взгляда,
-представим, что в нашем каталоге есть футболки мужские с атрибутами:
+представим, что в нашем каталоге есть футболки мужские всего с двумя атрибутами:
   - цвет
   - размер
 
@@ -463,11 +467,13 @@ class CompositeAttribute(
 ## Обновление и удаление с JSONB и jsonb_set
 
 Основная логика, связанная с обновлением данных о варианте товара с помощью функции `jsonb_set` находится
-в репозитории: `ProductVariantRepository`. 
+в репозитории: `ProductVariantRepository`. Рассмотрим подробно несколько SQL запросов.
+К сожалению, при использовании Spring Data JPA мы можем использовать только нативные запросы, если
+хотим работать с `jsonb_set`.
 
-Начнем с простого. Как обновить цену конкретного артикула?
-Будем исходить из знания о том, что в таблице product_variants хранится запись о товаре со следующим
-списком артикулов:
+### Обновляем цену артикула
+Начнем с простого. Будем исходить из знания о том, что в таблице product_variants хранится запись о товаре 
+со следующим списком артикулов:
 ```json
 {
     "attrName": "clothes size",
@@ -493,8 +499,8 @@ class CompositeAttribute(
     ]
   }
 ```
-И нам требуется изменить цену нулевого артикула с sku="t-shirt/blue/XS/Brand/230". Чтобы этого добиться
-мы можем воспользоваться функцией `jsonb_set`. Ниже приведу полное описание из документации.  
+И нам требуется изменить цену нулевого артикула с `sku="t-shirt/blue/XS/Brand/230"`. Чтобы этого добиться
+мы можем воспользоваться функцией `jsonb_set`. Ниже приведу полное ее описание из документации.  
 
 ```text
 jsonb_set ( target jsonb, path text[], new_value jsonb [, create_if_missing boolean ] ) → jsonb
@@ -505,9 +511,9 @@ jsonb_set('[{"f1":1,"f2":null},2]', '{0,f3}', '[2,3,4]') → [{"f1": 1, "f2": nu
 
 Итак, из документации становится понятно, что для того, чтобы обновить значение в JSONB, нам 
 необходимо найти конкретный путь до поля, значение которого мы хотим поменять. В нашем случае - 
-это '{sku,0,price}', где 0 - индекс конкретного элемента Sku в списке. Однако при получении 
+это '{sku,0,price}', где 0 - индекс конкретного элемента `Sku` в списке. Однако при получении 
 запроса на обновление нам не передается индекс. Для того, чтобы его найти, воспользуемся 
-CTE и функцией jsonb_array_elements, раскрывающей элементы из JSON списка в множество значений. 
+CTE и функцией `jsonb_array_elements`, раскрывающей элементы из JSON списка во множество значений. 
 Также нам потребуется выражение `WITH ORDINALITY`, которое добавляет в выходные данные столбец типа `bigint`,
 числа в котором начинаются с 1 и увеличиваются на 1 для каждой строки, выданной функцией. 
 Тут стоит учитывать, что индексы в JSONB начинаются с 0, поэтому из полученного с помощью
@@ -552,7 +558,9 @@ WITH sku_path AS (
     ): Int
 ```
 
-Обновление поля stock у конкретного артикула происхоит аналогичным образом. 
+Обновление поля `stock` у конкретного артикула происхоит аналогичным образом. 
+
+### Добавление в конец списка
 
 Теперь предположим, что нам требуется добавить в конец списка в JSONB какое-то значение, например,
 еще одну фотографию. 
@@ -568,9 +576,9 @@ WITH sku_path AS (
 
 Как и в предыдущем случае воспользуемся функцией `jsonb_set`. Сейчас мы изначально знаем путь до
 элемента JSONB, в конец которого добавляем новый элемент, поэтому нам не понадобится CTE.
-Однако нам необходимо сконвертировать класс `AppImage` в строку в виде JSON, так как иначе 
-мы не сможем его скастить в запросе к типу `jsonb`. Для добавления в конец списка используется
-оператор `||`. Полный запрос будет выглядеть следующим образом:
+Однако нам необходимо сконвертировать добавляемый в коллекцию класс `AppImage` в строку в виде JSON,
+так как иначе мы не сможем его скастить в запросе к типу `jsonb`. Для добавления в конец списка 
+используется оператор `||`. Полный запрос будет выглядеть следующим образом:
 ```kotlin
 @Modifying
 @Query(
@@ -586,17 +594,299 @@ fun addImage(
 ): Int
 ```
 
-К сожалению, при использовании Spring Data JPA мы можем использовать только нативные запросы, если
-хотим работать с jsonb_set. 
+### Удаление из списка
 
-## REST API
-Сервис выставляет наружу несколько REST ручек для CRUD операций с такими сущностями как:
-- Seller
-- Shop
-- Category
-- Attribute
-- Product
-- ProductVariant
+К сожалению, нет функции, которая позволяет просто удалить значение из списка в JSONB. Однако это не 
+безвыходная ситуация. Можем воспользоваться комбинацией функций: `jsonb_set`, `jsonb_array_elements` и `jsonb_agg`.
+Первые две уже знакомы, `jsonb_agg` аггрегирует передаваемые значения в JSON список. 
+
+Логика удаления такая: проходим по каждому элементу списка, оставляем в нем только те элементы,
+которые не удовлетворяют условию удаления, аггрегируем их обратно в список. Но тут есть важный момент: 
+если после удаления в результирующем списке не останется элементов, то `jsonb_agg` вернет `NULL`, а нам 
+требуется сформировать пустой список, для этого воспользуемся функцией `COALESCE`, которая оставляет 
+первое не `NULL` значение. Первым параметром будет результат `jsonb_agg`, а вторым - пустой список. 
+
+Сам запрос:
+```kotlin
+@Modifying
+@Query(
+  """
+       UPDATE product_variants
+       SET image_collection = jsonb_set(
+           image_collection,
+           '{images}',
+           COALESCE(
+               (SELECT jsonb_agg(elem) 
+               FROM jsonb_array_elements(image_collection->'images') elem 
+               WHERE elem->>'url' != :imageUrl),
+               '[]'\:\:jsonb
+           )    
+       )
+       WHERE id = :variantId
+   """, nativeQuery = true
+)
+fun removeImage(
+  @Param("variantId") variantId: Long,
+  @Param("imageUrl") imageUrl: String
+): Int
+```
+
+### Удаление из списка при двойной вложенности
+
+Допустим, что сейчас у товара следующий набор атрибутов:
+```json
+{
+  "attributes": [
+    {
+      "id": "colorAttrId",
+      "attributeName": "color",
+      "shortName": "color",
+      "isFaceted": true,
+      "type": "color",
+      "isRequired": true,
+      "availableValues": [
+        {
+          "colorValue": "red",
+          "colorHex": "FF0000",
+          "type": "color_type"
+        }
+      ]
+    },
+    {
+      "id": "dimensId",
+      "attributeName": "clothes dimensions",
+      "shortName": "dimensions",
+      "isFaceted": true,
+      "type": "composite",
+      "isRequired": false,
+      "subAttributes": [
+        {
+          "attributeName": "width",
+          "shortName": "width",
+          "isFaceted": true,
+          "type": "numeric",
+          "availableValues": [
+            {
+              "numValue": 10.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 20.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 30.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            }
+          ]
+        },
+        {
+          "attributeName": "length",
+          "shortName": "length",
+          "isFaceted": true,
+          "type": "numeric",
+          "availableValues": [
+            {
+              "numValue": 10.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 20.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 30.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            }
+          ]
+        },
+        {
+          "attributeName": "depth",
+          "shortName": "depth",
+          "isFaceted": true,
+          "type": "numeric",
+          "availableValues": [
+            {
+              "numValue": 10.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 20.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 30.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            }
+          ]
+        }
+      ],
+      "availableValues": []
+    }
+  ]
+}
+```
+
+И нам необходимо удалить в атрибуте "clothes dimensions", в под-атрибуте "width" удалить значение "numValue" = 10.0.
+Для того, чтобы это сделать, нам придется:
+1. Найти индекс атрибута с названием "clothes dimensions"
+```sql
+WITH attr_path AS (
+      SELECT CAST((index - 1) AS INTEGER) AS idx 
+      FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+      WHERE id = :variantId AND elem->>'attributeName' = :attrName
+),
+```
+2. Найти индекс под-атрибута с названием "width" и сформировать путь до списка `availableValues`.
+```sql
+sub_attr_path AS (
+    SELECT('{attributes,'||(SELECT idx FROM attr_path)||',subAttributes,'||index - 1||',availableValues}')\:\:text[] as path,
+    CAST((index - 1) AS INTEGER) AS idx
+    FROM product_variants, jsonb_array_elements(attribute_collection->'attributes'->(SELECT idx AS INTEGER FROM attr_path)->'subAttributes') WITH ORDINALITY arr(elem, index)
+    WHERE id = :variantId AND elem->>'attributeName' = :subAttrName
+)
+```
+3. Пройти по списку "availableValues" и оставить в нем только те, элементы, которые не удовлетворяют условию удаления - то есть все, не равные 10.0.
+```sql
+COALESCE(
+         (SELECT jsonb_agg(elem)
+             FROM jsonb_array_elements(attribute_collection->'attributes'->ap.idx->'subAttributes'->sap.idx->'availableValues') elem
+             WHERE CAST(elem->>'numValue' AS DOUBLE PRECISION) != :numValue 
+         ),
+         '[]'\:\:jsonb
+     )
+```
+В целом задача похожа на предыдущие, только добавляется второй уровень вложенности. 
+Общий запрос выглядит следующим образом:
+
+```kotlin
+@Modifying
+@Query("""
+       WITH attr_path AS (
+           SELECT CAST((index - 1) AS INTEGER) AS idx 
+           FROM product_variants, jsonb_array_elements(attribute_collection->'attributes') WITH ORDINALITY arr(elem, index)
+           WHERE id = :variantId AND elem->>'attributeName' = :attrName
+       ),
+        sub_attr_path AS (
+           SELECT('{attributes,'||(SELECT idx FROM attr_path)||',subAttributes,'||index - 1||',availableValues}')\:\:text[] as path,
+           CAST((index - 1) AS INTEGER) AS idx
+           FROM product_variants, jsonb_array_elements(attribute_collection->'attributes'->(SELECT idx AS INTEGER FROM attr_path)->'subAttributes') WITH ORDINALITY arr(elem, index)
+           WHERE id = :variantId AND elem->>'attributeName' = :subAttrName
+       )
+       UPDATE product_variants
+       SET attribute_collection = jsonb_set(
+           attribute_collection,
+           sap.path,
+           COALESCE(
+                    (SELECT jsonb_agg(elem)
+                        FROM jsonb_array_elements(attribute_collection->'attributes'->ap.idx->'subAttributes'->sap.idx->'availableValues') elem
+                        WHERE CAST(elem->>'numValue' AS DOUBLE PRECISION) != :numValue 
+                    ),
+                    '[]'\:\:jsonb
+                )
+       )
+       FROM attr_path ap, sub_attr_path sap 
+       WHERE id = :variantId
+   """, nativeQuery = true)
+fun removeCompositeAttributeNumericValue(
+  @Param("variantId") variantId: Long,
+  @Param("attrName") attrName: String,
+  @Param("subAttrName") subAttrName: String,
+  @Param("numValue") numValue: Double,
+  ): Int
+```
+
+Остальные запросы очень похожи на то, что разобрано выше, поэтому не составят труда для понимания. 
+Для наглядности в проекте есть тесты как `ProductVariantRepository`, так и `ProductVariantController` - 
+запуск тестов потребует наличия Docker, так как используется библиотека TestContainers. 
 
 ## Примечание
-TBD
+Функционал работы с JSONB в Postgres гораздо обширнее того, что рассмотрено выше. Поддерживается множество других 
+функций, [аггрегирующие операторы](https://www.postgresql.org/docs/16/functions-aggregate.html), 
+можно [создать GIN индекс](https://postgrespro.ru/docs/postgrespro/9.5/datatype-json) с классом
+операторов `jsonb_ops` или `jsonb_path_ops` отличающихся по набору доступных операторов, 
+производительности и памяти. 
+ 
+
+## Дополнительно
+Сервис выставляет наружу несколько REST ручек для CRUD операций с такими сущностями как:
+- Seller
+  - POST /v1/sellers - создать продавца
+  - GET /v1/sellers/{id} - получить продавца по id
+- Shop
+  - POST /v1/shops - создать магазин
+  - GET /v1/shops/{id} - получить магазин по id
+- Category
+  - POST /v1/categories - создать категорию
+  - GET /v1/categories/{id} - получить категорию по id
+  - GET /v1/categories - получить все категории
+  - PUT /v1/categories/{id}/attributes - добавить атрибут в категорию
+- Attribute
+  - POST /v1/attributes - создать атрибут
+  - GET /v1/attributes/category/{categoryName} - получить атрибуты для категории
+  - GET /v1/attributes/all - получить все атрибуты 
+  - GET /v1/attributes/{name} - получить атрибут по названию
+  - PUT /v1/attributes/{id}/value - добавить значение атрибуту
+- Product
+  - POST /v1/products - создать товар
+  - GET /v1/products/{id} - получить товар по id
+  - GET /v1/products/variant/{id} - получить список вариантов товара по id
+  - PUT /v1/products/{productId}/variant - добавить вариант товара
+  - DELETE /v1/products/{productId}/variant/{variantId} - удалить вариант товара
+  - DELETE /v1/products/{productId} - удалить товар
+  - PATCH /v1/products/{productId} - обновить товар
+- ProductVariant
+  - PATCH /v1/product-variants/sku-stock - обновить количество товара по артикулу
+  - PATCH /v1/product-variants/sku-price - обновить цену артикула
+  - PATCH /v1/product-variants/price - обновить цену варианта товара
+  - PATCH /v1/product-variants/{id}/name - обновить название варианта товара
+  - PATCH /v1/product-variants/{id}/photo - добавить фото 
+  - DELETE /v1/product-variants/{id}/photo - удалить фото
+  - PATCH /v1/product-variants/{id}/attribute - добавить атрибут
+  - DELETE /v1/product-variants/{id}/attribute - удалить атрибут
+  - PATCH /v1/product-variants/{id}/attribute-value - добавить значение атрибуту
+  - DELETE /v1/product-variants/{id}/attribute-value-delete - удалить значение у атрибута
+  - PATCH /v1/product-variants/{id}/composite-attribute-value - добавить значение составному атрибуту
+  - DELETE /v1/product-variants/{id}/composite-attribute-value-delete - удалить значение у составного атрибута
+
+Также в сервисе реализовано транзакционное сохранение событий о добавлении / обновление товаров и их вариантов
+в отдельные outbox таблицы, которые могут вычитываться коннекторами и отправлять данные, например, в Kafka. 
+
+
+## Запуск приложения
+1. Перейти в директорию docker и стартовать контейнер с Postgres 
+```shell
+docker-compose up -d
+```
+2. Выполнить чистый билд без тестов
+```shell
+./gradlew clean build -x test
+```
+3. Стартовать приложение
+```shell
+./gradlew bootRun
+```
+
+### Известные проблемы
+1. Тесты `ProductVariantControllerTest` и `ProductVariantRepositoryTest` необходимо запускать
+по отдельности от остальных тестов, так как не может отработать инициализационный скрипт 
+`insert_product.sql` из-за того, что в некоторых тестах происходит очищение базы после каждого тестового
+метода, а в этих классах - после всех методов. 

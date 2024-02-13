@@ -1,0 +1,108 @@
+{
+  "attributes": [
+    {
+      "id": "colorAttrId",
+      "attributeName": "color",
+      "shortName": "color",
+      "isFaceted": true,
+      "type": "color",
+      "isRequired": true,
+      "availableValues": [
+        {
+          "colorValue": "red",
+          "colorHex": "FF0000",
+          "type": "color_type"
+        }
+      ]
+    },
+    {
+      "id": "dimensId",
+      "attributeName": "clothes dimensions",
+      "shortName": "dimensions",
+      "isFaceted": true,
+      "type": "composite",
+      "isRequired": false,
+      "subAttributes": [
+        {
+          "attributeName": "width",
+          "shortName": "width",
+          "isFaceted": true,
+          "type": "numeric",
+          "availableValues": [
+            {
+              "numValue": 10.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 20.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 30.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            }
+          ]
+        },
+        {
+          "attributeName": "length",
+          "shortName": "length",
+          "isFaceted": true,
+          "type": "numeric",
+          "availableValues": [
+            {
+              "numValue": 10.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 20.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 30.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            }
+          ]
+        },
+        {
+          "attributeName": "depth",
+          "shortName": "depth",
+          "isFaceted": true,
+          "type": "numeric",
+          "availableValues": [
+            {
+              "numValue": 10.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 20.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            },
+            {
+              "numValue": 30.0,
+              "numRuValue": null,
+              "numUnit": "mm",
+              "type": "numeric_type"
+            }
+          ]
+        }
+      ],
+      "availableValues": []
+    }
+  ]
+}

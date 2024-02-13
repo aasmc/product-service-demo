@@ -57,7 +57,7 @@ class ProductController(
         productService.deleteProduct(productId)
     }
 
-    @PutMapping("/{productId}")
+    @PatchMapping("/{productId}")
     fun updateProduct(
         @PathVariable productId: String,
         @RequestBody dto: ProductUpdateDto

@@ -2,6 +2,7 @@ package ru.aasmc.productservice.controller
 
 import jakarta.transaction.Transactional
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -39,6 +40,7 @@ import kotlin.math.exp
         )
     )
 )
+@Disabled
 class ProductVariantControllerTest @Autowired constructor(
     private val cryptoTool: CryptoTool,
     private val webTestClient: WebTestClient

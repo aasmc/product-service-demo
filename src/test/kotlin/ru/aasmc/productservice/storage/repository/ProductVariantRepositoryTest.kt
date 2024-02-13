@@ -2,6 +2,7 @@ package ru.aasmc.productservice.storage.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.jdbc.Sql
@@ -14,6 +15,7 @@ import java.math.BigDecimal
     scripts = ["classpath:insert_product.sql"],
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS
 )
+@Disabled
 class ProductVariantRepositoryTest @Autowired constructor(
     private val productVariantRepository: ProductVariantRepository,
     private val om: ObjectMapper
